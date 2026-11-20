@@ -1,0 +1,2078 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>■</title>
+<style>
+:root{font-family:"Courier New",Courier,monospace;color-scheme:light}*{box-sizing:border-box}
+body{margin:0;min-height:100svh;background:radial-gradient(ellipse at 50% 0%,#6a6555,#4a4639 82%);display:grid;place-items:center;padding:16px}
+.device{position:relative;width:min(96vw,950px);padding:24px 25px 30px;background:#cfc6b4;border-radius:15px 15px 9px 9px;border-top:3px solid #efe8d8;border-left:3px solid #e3dbc9;border-right:5px solid #a89e8a;border-bottom:9px solid #7d7462;box-shadow:0 22px 55px #0008,inset 0 -6px 12px #0002}
+.device-top{height:20px;display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.power{width:11px;height:11px;border-radius:50%;background:#b9b7b2;box-shadow:0 0 7px #d7d3cb;cursor:pointer;touch-action:manipulation}
+.vents{display:flex;gap:5px}.vents i{display:block;width:26px;height:4px;border-radius:3px;background:#a89e8a;box-shadow:inset 0 1px 2px #0005}
+.monitor-frame{background:#211e18;padding:14px;border-radius:11px;box-shadow:inset 0 4px 10px #000b,inset 0 -2px 4px #fff1}
+.monitor{position:relative;height:clamp(175px,27vw,248px);background:#0e0817;border-radius:9px;box-shadow:inset 0 0 65px #000c,inset 0 0 9px #000;display:flex;align-items:center;justify-content:center;gap:clamp(20px,6vw,64px);overflow:hidden}
+.monitor::before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:repeating-linear-gradient(0deg,#0003 0 1px,transparent 1px 3px)}
+.monitor::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse at 30% 12%,#fff1,transparent 55%)}
+.star{font-size:clamp(45px,9vw,82px);line-height:1;color:#392748;text-shadow:0 0 7px #000;z-index:1}.star.on{color:#d69aff;text-shadow:0 0 12px #d69affaa,0 0 28px #b56cff66}
+.key-deck{margin-top:18px;padding:16px 14px 22px;background:#a89e8a;border-radius:7px;box-shadow:inset 0 3px 7px #0005}
+.panel{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:clamp(3px,1vw,10px)}
+/* Keycaps modeled after the reference computer's ivory keyboard. */
+.key{height:clamp(32px,5.8vw,62px);min-width:0;appearance:none;border:0;border-radius:3px;border-bottom:4px solid #9a917e;position:relative;cursor:pointer;background:#efe8d8;box-shadow:inset 0 1px 1px #fff8;touch-action:manipulation;transition:none;user-select:none;-webkit-user-select:none}
+.key:hover:not(:disabled):not(.lit){background:#fffaf0}
+/* A key travels downward only while physically held, never as a persistent state. */
+.key:active:not(:disabled){transform:translateY(3px);border-bottom-width:1px}
+.key:disabled{cursor:default}
+.key.lit{background:#f1e8d6;box-shadow:inset 0 0 9px #fff3c4aa,0 0 11px #fff3c466;border-bottom-color:#a99b83}
+.key.lit:active:not(:disabled){transform:translateY(3px);border-bottom-width:1px}
+.debugbar{display:none;margin-top:16px;justify-content:space-between;gap:12px;align-items:center;color:#4c4539;font:12px/1.5 ui-monospace,Consolas,monospace}.device.debug .debugbar{display:flex}
+.device.debug .key::after{content:attr(data-mark);position:absolute;inset:0;display:grid;place-items:center;font:bold clamp(12px,2vw,22px) ui-monospace,monospace;color:#4c4539}.device.debug .key.lit::after{color:#4c4539}
+.placeholder{display:none;text-align:center;margin-top:16px;color:#4c4539;font:12px ui-monospace,monospace}.device.debug .placeholder{display:block}
+.device.debug .panel.ttt{grid-template-columns:repeat(3,minmax(0,1fr));max-width:260px;margin-left:auto;margin-right:auto}.device.debug .panel.ttt .key[data-digit='0']{grid-column:1/-1;max-width:66px;justify-self:center}
+@keyframes machine-shake{0%,100%{transform:translate(0)}20%{transform:translate(-7px,4px)}40%{transform:translate(8px,-4px)}60%{transform:translate(-9px,-1px)}80%{transform:translate(6px,5px)}}
+.device.exploding{animation:machine-shake .28s linear infinite}
+#explosion-flash{position:fixed;inset:0;pointer-events:none;background:#e9dcff;opacity:0;z-index:50}
+#explosion-dead{display:none;position:fixed;inset:0;z-index:60;background:#030206;align-items:center;justify-content:center}
+#explosion-dead.show{display:flex}
+#explosion-dot{width:5px;height:5px;border-radius:50%;background:#d69aff;box-shadow:0 0 14px #d69aff}
+@media(max-width:480px){body{padding:8px}.device{padding:14px 12px 20px}.monitor-frame{padding:9px}.monitor{height:190px}.key-deck{padding:12px 7px 17px}.panel{gap:3px}.key{height:clamp(25px,7.5vw,36px);border-bottom-width:3px}.key:active:not(:disabled){border-bottom-width:1px}.star{font-size:48px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+
+/* === CORRUPTED CRT / cyan-red chromatic aberration theme === */
+:root{--cyan:#6db6b9;--red:#c94b4e;--steel:#999b97;--phosphor:#91c2c1}
+body{
+  background:radial-gradient(ellipse at 50% 35%,#373c3b 0%,#1d2223 57%,#0b0c0d 100%);
+  color:#b6bdbc;
+}
+.device{
+  background:linear-gradient(150deg,#6a706e 0%,#525958 38%,#3a4142 100%);
+  border-top-color:#929795;border-left-color:#808684;
+  border-right-color:#252a2c;border-bottom-color:#1b1e21;
+  box-shadow:0 26px 70px #000c,inset 0 2px 3px #ffffff22,inset 0 -12px 24px #090d0f55;
+}
+.vents i{background:#292f30;box-shadow:inset 0 1px 2px #0008}
+.power{background:#79999a;box-shadow:0 0 4px #83c6c6a0,1px 0 2px #c7444888}
+.monitor-frame{
+  padding:clamp(12px,2vw,20px);
+  background:linear-gradient(130deg,#0c0e10,#1f2627 45%,#07090a);
+  border:2px solid #353a3a;
+  border-radius:38px / 27px;
+  box-shadow:inset 0 7px 19px #000,inset 0 -2px 5px #ffffff16,0 1px 2px #ffffff18;
+}
+.monitor{
+  height:clamp(210px,30vw,300px);
+  border-radius:14px;
+  background:
+    radial-gradient(ellipse at 49% 47%,#303537 0%,#212729 45%,#0b0d0e 84%,#020303 100%);
+  box-shadow:inset 0 0 70px 22px #000c,inset 0 0 12px 4px #020405,0 0 1px #8ca4a180;
+  isolation:isolate;
+}
+/* CRT scanlines plus irregular interference bands */
+.monitor::before{
+  content:"";position:absolute;inset:0;z-index:4;pointer-events:none;border-radius:inherit;
+  background:
+    repeating-linear-gradient(0deg,#02040452 0px,#02040452 1px,transparent 2px,transparent 4px),
+    repeating-linear-gradient(90deg,transparent 0 3px,#d8ffff06 3px 4px),
+    linear-gradient(180deg,transparent 0%,#d3eded0b 47%,transparent 49%,#00000029 54%,transparent 100%);
+  opacity:.84;
+}
+.monitor::after{
+  content:"";position:absolute;inset:0;z-index:5;pointer-events:none;border-radius:inherit;
+  background:
+    radial-gradient(ellipse at 50% 46%,transparent 21%,#02030433 56%,#000000c7 98%),
+    radial-gradient(ellipse at 28% 8%,#ffffff17,transparent 45%),
+    linear-gradient(100deg,transparent 40%,#ffffff05 53%,transparent 62%);
+}
+.round-lamps{display:flex;gap:5px;align-items:center;position:static;z-index:auto}
+.round-lamps .lamp{display:block;width:26px;height:4px;border-radius:2px;background:#292f30;box-shadow:inset 0 1px 2px #0008;opacity:1;transition:background .15s,box-shadow .15s}
+.round-lamps .lamp.on{background:#94c4c3;box-shadow:inset 0 1px 1px #ffffff70,0 0 6px #8ec9c8ab,0 0 2px #e0646477}
+.round-lamps .lamp.current{height:4px}
+.star{
+  color:#4b5355;
+  text-shadow:-2px 0 #b9454544,2px 0 #42bdc266,0 0 8px #060a0a;
+  font-family:monospace;
+  opacity:.9;
+}
+.star.on{
+  color:#a6c8c7;
+  text-shadow:-2px 0 #c9434fa8,2px 0 #30bfc9bd,0 0 13px #7abebe9f,0 0 30px #599d9d4e;
+}
+.qubi-hud{position:absolute;left:18px;top:18px;z-index:3;display:flex;align-items:center;gap:12px;opacity:.93;pointer-events:none}
+.qubi-face{width:60px;height:60px;image-rendering:pixelated;filter:none}
+.qubi-meta{display:flex;flex-direction:column;align-items:center;gap:3px}
+.qubi-glyph{width:22px;height:22px;image-rendering:pixelated;transform:none;filter:drop-shadow(-1px 0 2px #cb4f4faa) drop-shadow(1px 0 2px #39c8cdaa)}
+.qubi-name{color:#85b2b2;font-size:10px;line-height:1;letter-spacing:.08em;text-shadow:-1px 0 #c9434f60,1px 0 #30bfc980}
+.key-deck{
+  background:linear-gradient(#43494a,#363c3d);
+  border:1px solid #737a7880;
+  box-shadow:inset 0 4px 10px #0009,0 1px 0 #a2a7a340;
+}
+.key{
+  background:#aaaead;
+  border-bottom:4px solid #565d5e;
+  border-radius:3px;
+  box-shadow:inset 0 1px 1px #eff3ef80,1px 1px 0 #171d1e7a;
+}
+.key:hover:not(:disabled):not(.lit){background:#c3c9c7}
+.key.lit{
+  background:#a7c2c1;
+  border-bottom-color:#536667;
+  box-shadow:inset 0 0 10px #c5ffff65,0 0 9px #48acb788,1px 0 2px #d14a5077;
+}
+.debugbar,.placeholder{color:#b5c3c3}
+.device.debug .key::after,.device.debug .key.lit::after{color:#273030}
+#explosion-flash{background:#d8eeee}
+#explosion-dead{background:#020506}
+#explosion-dot{background:#8ac8c8;box-shadow:-2px 0 9px #d44b51,2px 0 9px #38c5cc}
+@media(max-width:480px){.monitor{height:210px;border-radius:12px}.monitor-frame{padding:11px;border-radius:22px}.qubi-hud{left:14px;top:14px;gap:10px}.qubi-face{width:50px;height:50px}.qubi-glyph{width:18px;height:18px}.round-lamps{gap:4px}.round-lamps .lamp{width:20px}.device{padding:14px 12px 20px}}
+
+
+/* Subtle CRT interference: phosphor shimmer, intermittent tracking jitter. */
+.monitor{animation:crt-flicker 59s infinite}
+.monitor::before{animation:none}
+.crt-interference{position:absolute;inset:0;pointer-events:none;z-index:6;opacity:0;
+  background:linear-gradient(180deg,transparent 0 46%,#a1d8d811 48%,#05070824 50%,transparent 52%);
+  mix-blend-mode:screen;animation:crt-interference 73s steps(1,end) infinite}
+@keyframes crt-flicker{
+  0%,63.7%,63.95%,100%{filter:brightness(1)}
+  63.8%{filter:brightness(.88)}
+}
+@keyframes crt-interference{
+  0%,71.2%,71.45%,100%{opacity:0;transform:translateY(0)}
+  71.3%{opacity:.16;transform:translateY(2px)}
+}
+/* Round 1: eight masked password cells on the CRT. */
+.password-display{display:none;position:absolute;inset:0;z-index:2;align-items:center;justify-content:center;gap:clamp(4px,1vw,13px);padding:0 18px;pointer-events:none}
+.device[data-round="1"] .password-display{display:flex}
+.password-cell{width:clamp(19px,4.4vw,44px);height:clamp(38px,7vw,66px);display:flex;align-items:center;justify-content:center;border-bottom:2px solid #667d7d55;color:#aecfd0;font:bold clamp(27px,5vw,49px)/1 "Courier New",monospace;text-shadow:-1px 0 #b94e4e99,1px 0 #37c4c9aa,0 0 12px #8bcaca88}
+.password-cell:not(.filled){color:transparent}
+@media(max-width:480px){.password-display{gap:4px;padding:0 10px}.password-cell{width:clamp(19px,8vw,31px);height:43px;font-size:29px}}
+/* Round 3: masked six-character keyword entry, phosphor-only typography. */
+.word-display{display:none;position:absolute;z-index:2;inset:0;padding:84px 22px 16px;align-items:center;justify-content:center;flex-direction:column;gap:9px;color:#a6c9c8;pointer-events:none}
+.device[data-round="3"] .word-display{display:flex}
+.device[data-round="3"] .star{display:none}
+.word-current{display:flex;justify-content:center;gap:clamp(4px,1vw,10px);width:100%}
+.word-cell{width:clamp(25px,5.4vw,48px);height:clamp(33px,6vw,48px);border-bottom:2px solid #88b6b58c;text-align:center;font:bold clamp(20px,3.7vw,34px)/1.45 'Courier New',monospace;text-shadow:0 0 8px #76adad88}
+.word-history{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;max-height:87px;overflow:hidden}
+.word-history-row{font:clamp(11px,1.6vw,14px)/1.2 'Courier New',monospace;letter-spacing:.09em;white-space:pre;color:#91aaaa}
+.word-selection{font:11px/1.3 'Courier New',monospace;letter-spacing:.2em;min-height:14px;color:#85a3a3}
+/* Qubi's click-to-demonstrate action is intentionally undisclosed. */
+.device[data-round="3"] .qubi-hud{pointer-events:none;cursor:default}
+.device[data-round="3"] .qubi-face{pointer-events:auto;cursor:default}
+@media(max-width:480px){.word-display{padding:70px 8px 12px;gap:7px}.word-cell{height:33px}.word-history{max-height:65px}.word-history-row{font-size:10px}}
+/* Hide the star display entirely during the first round. */
+.device[data-round="1"] .star{display:none}
+
+/* Round 2: victory is an extension of the existing CRT HUD. The *** slots stay visible. */
+.round2-win{display:none;position:absolute;inset:0;z-index:2;background:transparent;color:#a6c8c7;pointer-events:none;font-family:'Courier New',monospace;text-shadow:-2px 0 #c9434f55,2px 0 #30bfc966,0 0 12px #7abebe88}
+.device[data-round="2"][data-winshow="1"] .round2-win{display:block}
+.win-title{position:absolute;left:0;right:0;top:clamp(60px,24%,80px);text-align:center;font:bold clamp(19px,4vw,32px)/1 'Courier New',monospace;letter-spacing:.09em;color:#a6c8c7}
+.win-boards{position:absolute;left:0;right:0;top:65%;bottom:auto;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;gap:clamp(10px,2vw,22px)}
+.mini-board{display:grid;grid-template-columns:repeat(3,12px);grid-template-rows:repeat(3,12px);gap:2px;padding:2px}
+.mini-cell{width:12px;height:12px;border:1px solid #779b9a66;display:flex;align-items:center;justify-content:center;font:bold 10px/1 'Courier New',monospace;color:#9dbebd}
+.mini-cell.o::before{content:"O"}
+.mini-cell.x::before{content:"X"}
+@media(max-width:480px){.win-title{top:62px;font-size:20px}.win-boards{top:68%;bottom:auto}.mini-board{grid-template-columns:repeat(3,10px);grid-template-rows:repeat(3,10px)}.mini-cell{width:10px;height:10px;font-size:9px}}
+
+/* Qubi blinks only as it makes its move; no other visual effects. */
+.qubi-face.qubi-acting{transform:none} /* No extra glow or movement for Qubi's move. */
+/* Original Qubi glyph language: unobtrusive hint control and streamed dialogue. */
+.hint-trigger{position:absolute;right:17px;top:17px;z-index:3;width:28px;height:28px;padding:2px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;cursor:pointer;opacity:.63;transition:opacity .15s,filter .15s}
+.hint-trigger canvas{display:block;width:22px;height:22px;image-rendering:pixelated}
+.hint-trigger:hover,.hint-trigger:focus-visible{opacity:1;filter:brightness(1.5) drop-shadow(0 0 4px #b7d5d5)}
+.hint-trigger:focus-visible{outline:1px dotted #9abdbb;outline-offset:3px}
+.hint-dialog{display:none;position:absolute;z-index:9;left:clamp(82px,11vw,116px);top:20px;max-width:calc(100% - 160px);min-width:120px;flex-direction:column;align-items:flex-start;gap:9px;color:#b0d1cf;font:clamp(11px,1.5vw,14px)/1.35 'Courier New',monospace;text-shadow:0 0 5px #66a9ac66}
+.hint-dialog.open{display:flex}
+.hint-dialog-text{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-height:23px}
+.hint-dialog-text canvas{width:20px;height:20px;image-rendering:pixelated;filter:drop-shadow(0 0 3px #8dbaba55)}
+.hint-dialog-text .hint-question{font-size:15px;opacity:.8;margin-left:1px}
+.hint-dialog-actions{display:flex;gap:8px}
+.hint-choice{cursor:pointer;font:inherit;color:#b0d1cf;background:transparent;border:1px solid #6285849c;border-radius:2px;padding:4px 12px}
+.hint-choice:hover{background:#334447;color:#d0e6e5}
+.hint-choice:active{transform:translateY(1px)}
+.device.debug .hint-trigger::after{content:'힌트';position:absolute;top:100%;left:50%;transform:translateX(-50%);font-size:9px;color:#a3cccc}
+@media(max-width:480px){.hint-trigger{right:11px;top:11px;width:24px;height:24px}.hint-trigger canvas{width:19px;height:19px}.hint-dialog{top:17px;left:76px;max-width:calc(100% - 126px);min-width:0;gap:6px;font-size:11px}.hint-dialog-text{gap:4px}.hint-dialog-text canvas{width:17px;height:17px}.hint-choice{padding:3px 8px}.hint-dialog-actions{gap:5px}}
+/* Square keycaps: keep all ten keys on one row, including debug 3x3 mode. */
+.panel .key{width:100%;height:auto;aspect-ratio:1 / 1;}
+@media(max-width:480px){.panel .key{height:auto;aspect-ratio:1 / 1;}}
+@media(prefers-reduced-motion:reduce){.monitor,.monitor::before,.crt-interference{animation:none!important}}
+
+/* Anchor Qubi and the name glyph to the same top-left coordinates whether
+   or not the second dialogue line is visible. Dialogue must never recenter HUD. */
+.qubi-hud{align-items:flex-start}
+/* Qubi name stays visible; spoken glyphs appear on their own line beneath it. */
+.qubi-meta{flex-direction:column;align-items:flex-start;gap:6px;min-width:22px}
+.qubi-meta .qubi-glyph{flex:none}
+.qubi-hud:has(.hint-dialog.open) .qubi-glyph{display:block}
+.hint-dialog,.hint-dialog.open{position:static;left:auto;top:auto;max-width:none;min-width:0;flex-direction:row;align-items:center;gap:11px;white-space:nowrap}
+.hint-dialog{display:none}
+.hint-dialog.open{display:flex;pointer-events:auto}
+.hint-dialog-text{flex-wrap:nowrap;gap:5px;min-height:22px}
+.hint-dialog-text canvas{width:22px;height:22px;flex:none}
+.hint-dialog-actions{display:flex;flex-direction:row;align-items:center;gap:7px}
+.hint-dialog-actions[hidden]{display:none!important}
+.hint-choice{border:1px solid #719291;background:rgba(141,185,185,.035);padding:5px 10px;min-height:34px;display:flex;align-items:center;justify-content:center;opacity:.9;cursor:pointer;transition:background .15s,border-color .15s,filter .15s;box-shadow:inset 0 1px 0 #c0e0dd1b}
+.hint-choice:hover,.hint-choice:focus-visible{background:rgba(155,207,204,.16);border-color:#a9d2d0;opacity:1;filter:brightness(1.18)}
+.hint-choice:active{transform:translateY(1px);background:rgba(155,207,204,.22)}
+.hint-choice canvas{display:block;width:22px;height:22px;image-rendering:pixelated}
+@media(max-width:480px){.qubi-meta{min-width:18px}.hint-dialog,.hint-dialog.open{gap:5px}.hint-dialog-text{gap:3px}.hint-dialog-text canvas,.hint-choice canvas{width:17px;height:17px}.hint-choice{padding:2px}.hint-dialog-actions{gap:3px}}
+/* Keep the spoken line anchored even while its reply buttons are not yet shown. */
+.hint-dialog,.hint-dialog.open{align-items:flex-start}
+.hint-dialog-text{min-height:34px;align-items:center}
+.hint-dialog-actions[hidden]{display:flex!important;visibility:hidden;pointer-events:none}
+.hint-dialog-actions:not([hidden]){visibility:visible}
+/* Square, instantaneous button feedback; no eased hover animations. */
+.hint-choice{border-radius:0;transition:none!important}
+.hint-choice:hover,.hint-choice:focus-visible{transition:none!important}
+.hint-trigger{transition:none!important}
+
+/* === Original Qubi computer visual restoration === */
+
+/* === Original Qubi computer visual restoration === */
+/* Keep the three-round game layout, restore the original device palette and finish. */
+:root{--case:#cfc6b4;--case-dark:#a89e8a;--case-shadow:#7d7462;--screen:#081208;--phos:#57ff8a;--phos-dim:#2b7a45;--phos-faint:#153822;--amber:#ffcf6e}
+body{background:#5b5648;background-image:radial-gradient(ellipse at 50% 0%,#6a6555,#4a4639 80%);color:var(--phos);}
+.device{background:var(--case);border-radius:14px 14px 8px 8px;border-top:3px solid #efe8d8;border-left:3px solid #e3dbc9;border-right:4px solid var(--case-dark);border-bottom:8px solid var(--case-shadow);box-shadow:0 18px 40px #0008,inset 0 -6px 12px #0002;padding:20px 22px 20px;}
+.power{background:#3adf60;box-shadow:0 0 7px #3adf60;animation:ledblink 4s infinite;}
+@keyframes ledblink{0%,92%,100%{opacity:1}95%{opacity:.3}}
+.vents i,.round-lamps .lamp{background:var(--case-dark);box-shadow:inset 0 1px 2px #0006;border-radius:2px;transition:none;}
+.round-lamps .lamp.on{background:#3adf60;box-shadow:0 0 7px #3adf60;}
+.monitor-frame{background:#211e18;border:0;border-radius:10px;padding:14px;box-shadow:inset 0 4px 10px #000b,inset 0 -2px 4px #fff1;}
+.monitor{background:var(--screen);border-radius:8px;box-shadow:inset 0 0 60px #000d,inset 0 0 8px #000;isolation:auto;animation:flick 7s infinite;}
+.monitor::before{border-radius:inherit;background:repeating-linear-gradient(0deg,#0003 0 1px,transparent 1px 3px);opacity:1;}
+.monitor::after{border-radius:inherit;background:radial-gradient(ellipse at 30% 15%,#ffffff12,transparent 45%);}
+.crt-interference{display:none;}
+@keyframes flick{0%,96%,100%{opacity:1}97%{opacity:.86}98%{opacity:1}99%{opacity:.93}}
+.qubi-hud{opacity:1;}
+.qubi-face{filter:drop-shadow(0 0 5px #57ff8a80);}
+.qubi-glyph{filter:drop-shadow(0 0 3px #57ff8a59);opacity:.85;}
+.key-deck{margin-top:14px;background:var(--case-dark);border:0;border-radius:6px;padding:12px;box-shadow:inset 0 3px 6px #0006;}
+.key{background:#efe8d8;border:0;border-bottom:4px solid #9a917e;border-radius:3px;box-shadow:none;}
+.key:hover:not(:disabled):not(.lit){background:#fffaf0;}
+.key.lit{background:#f7e9b8;border-bottom-color:#b09a4d;box-shadow:0 0 8px #c9a24d99;}
+.debugbar,.placeholder{color:#6a6250;}
+.device.debug .key::after,.device.debug .key.lit::after{color:#6a6250;}
+.password-cell{color:var(--phos);border-bottom-color:var(--phos-dim);text-shadow:0 0 5px #57ff8a80;}
+.word-display{color:var(--phos);}
+.word-cell{border-bottom-color:var(--phos-dim);color:var(--phos);text-shadow:0 0 5px #57ff8a80;}
+.word-history-row{color:var(--phos);}
+.word-selection{color:var(--phos-dim);}
+.star{color:var(--phos-dim);text-shadow:none;opacity:1;}
+.star.on{color:var(--phos);text-shadow:0 0 5px #57ff8a80;}
+.progress-cell{border-bottom-color:var(--phos-dim);}
+/* Round 2 always displays three empty, underlined slots before any wins. */
+.device[data-round="2"] .monitor{gap:clamp(8px,2.2vw,20px)}
+.device[data-round="2"] .progress-cell{display:flex;align-items:center;justify-content:center;width:clamp(28px,6vw,50px);height:clamp(40px,7vw,62px);border-bottom:2px solid var(--phos-dim);font:bold clamp(30px,5vw,48px)/1 'Courier New',monospace;box-sizing:border-box}
+
+.round2-win{color:var(--phos);text-shadow:0 0 5px #57ff8a80;}
+.win-title{color:var(--phos);}
+.mini-cell{border-color:var(--phos-faint);color:var(--phos);}
+.hint-trigger{opacity:.75;filter:none;}
+.hint-trigger:hover,.hint-trigger:focus-visible{opacity:1;filter:brightness(1.35);}
+.hint-trigger:focus-visible{outline-color:var(--phos-dim);}
+.hint-dialog{color:var(--phos);text-shadow:none;}
+.hint-dialog-text canvas{filter:drop-shadow(0 0 3px #57ff8a59);}
+.hint-choice{background:transparent;border:1px solid var(--phos-dim);border-radius:0;color:var(--phos);box-shadow:none;opacity:1;transition:none!important;}
+.hint-choice:hover,.hint-choice:focus-visible{background:var(--phos-faint);border-color:var(--phos-dim);filter:none;color:var(--phos);}
+.hint-choice:active{background:var(--phos-faint);}
+.device.debug .hint-trigger::after{color:var(--phos-dim);}
+#explosion-flash{background:#fff;}
+#explosion-dead{background:#000;}
+#explosion-dot{background:var(--phos);box-shadow:0 0 12px var(--phos);}
+@media(max-width:480px){.device{padding:14px 12px 20px}.monitor-frame{padding:11px;border-radius:10px}.monitor{border-radius:8px}}
+
+/* Round 1 completion: replace the eight password asterisks with Qubi digits. */
+.password-cell .password-glyph{display:block;width:74%;height:auto;aspect-ratio:1 / 1;max-height:100%;object-fit:contain;image-rendering:pixelated;flex:none;filter:drop-shadow(0 0 3px #57ff8a55)}
+/* Round 1 hint: original Qubi numeral glyphs on the ten keyboard keys. */
+.key .digit-glyph{display:none;position:absolute;left:50%;top:50%;width:clamp(16px,3vw,28px);height:clamp(16px,3vw,28px);transform:translate(-50%,-50%);image-rendering:pixelated;pointer-events:none;opacity:.92;}
+.device.round1-hint-active:not([data-round="3"]) .key .digit-glyph{display:block;}
+.device.debug .key.hint-number::after{display:none;}
+/* Numeral hint: use the source computer's 5x5 pixel glyph styling,
+   but scale it to fill these larger square keycaps proportionally. */
+.device.round1-hint-active:not([data-round="3"]) .panel .key{
+  display:flex;align-items:center;justify-content:center;
+  padding:0;
+}
+.key .digit-glyph{
+  position:static;left:auto;top:auto;
+  width:70%;height:70%;max-width:48px;max-height:48px;
+  flex:0 1 auto;aspect-ratio:1/1;
+  transform:none;opacity:1;image-rendering:pixelated;
+}
+@media(max-width:480px){
+  .key .digit-glyph{width:72%;height:72%;max-width:none;max-height:none;}
+}
+/* Taller CRT: reserve comfortable vertical room for Qubi's two-line dialogue. */
+.monitor{height:clamp(260px,35vw,330px);}
+@media(max-width:480px){.monitor{height:270px;}}
+/* Subdued corner hint glyph: visible but secondary to the CRT dialogue. */
+.hint-trigger{opacity:.38;filter:none;transition:none!important}
+.hint-trigger[hidden]{display:none!important}
+.hint-trigger:hover,.hint-trigger:focus-visible{opacity:.57;filter:none;transition:none!important}
+.device.debug .hint-trigger::after{content:none!important}
+/* Monitor controls never move or sink when pressed; keyboard keycaps stay physical. */
+.monitor button:active{transform:none!important;}
+
+/* Qubi HUD: a fixed two-line block centered against the face.
+   The name stays subdued and neither line moves when dialogue appears. */
+.qubi-hud{align-items:center;}
+.qubi-meta{display:grid;grid-template-rows:18px 34px;row-gap:7px;align-content:center;align-items:center;justify-items:start;min-height:60px;min-width:18px;}
+.qubi-meta .qubi-glyph{display:block;width:16px;height:16px;opacity:.42;filter:none;align-self:center;}
+.hint-dialog,.hint-dialog.open{grid-row:2;align-self:center;min-height:34px;}
+.hint-dialog-text{height:34px;min-height:34px;align-items:center;}
+@media(max-width:480px){
+ .qubi-meta{grid-template-rows:13px 32px;row-gap:5px;min-height:50px;min-width:14px;}
+ .qubi-meta .qubi-glyph{width:13px;height:13px;}
+ .hint-dialog,.hint-dialog.open,.hint-dialog-text{min-height:32px;}
+ .hint-dialog-text{height:32px;}
+ .hint-choice{min-height:32px;}
+}
+
+/* Restore the source computer's warm amber key illumination. */
+.key.lit,.key.lit:hover:not(:disabled){
+ background:#f7e9b8;
+ border-bottom-color:#b09a4d;
+ box-shadow:0 0 8px #c9a24d99;
+}
+/* Slightly smaller, quieter hint numerals on the ivory keycaps. */
+.key .digit-glyph{width:55%;height:55%;max-width:34px;max-height:34px;opacity:.65;}
+@media(max-width:480px){.key .digit-glyph{width:57%;height:57%;max-width:34px;max-height:34px;}}
+/* Preserve square source pixels: the 5×5 completion glyphs must never stretch. */
+.password-cell .password-glyph{width:min(74%, 36px);height:auto;aspect-ratio:1 / 1;flex-shrink:0}
+/* Qubi's small whole-body bounce accompanies joy and round-clear congratulations. */
+@keyframes qubi-joy-bounce{
+  0%,24.9%{transform:translateY(0)}
+  25%,49.9%{transform:translateY(-3px)}
+  50%,74.9%{transform:translateY(0)}
+  75%,99.9%{transform:translateY(2px)}
+  100%{transform:translateY(0)}
+}
+/* Hard pixel jumps with short holds between poses, never a smooth glide. */
+.qubi-face.qubi-joy{animation:qubi-joy-bounce .44s steps(1,end) 3;}
+@media(prefers-reduced-motion:reduce){.qubi-face.qubi-joy{animation:none}}
+
+/* Victory mini-boards inherit the round-two hint's row mapping, only when unlocked. */
+.device.round2-hint-active[data-round="2"] .round2-win .mini-cell:is(.o,.x):nth-child(-n+3){color:#cb8178;}
+.device.round2-hint-active[data-round="2"] .round2-win .mini-cell:is(.o,.x):nth-child(n+4):nth-child(-n+6){color:#82ab72;}
+.device.round2-hint-active[data-round="2"] .round2-win .mini-cell:is(.o,.x):nth-child(n+7){color:#7f9ec8;}
+
+/* Round 2 hint: keep ivory keycaps; colored outlines reveal three groups.
+   Only an occupied/illuminated key fills with its group color. */
+.device.round2-hint-active .key:is([data-digit="1"],[data-digit="2"],[data-digit="3"]):not(.lit){
+ background:#efe8d8;
+ box-shadow:inset 0 0 0 2px #cb8178;
+}
+.device.round2-hint-active .key:is([data-digit="4"],[data-digit="5"],[data-digit="6"]):not(.lit){
+ background:#efe8d8;
+ box-shadow:inset 0 0 0 2px #82ab72;
+}
+.device.round2-hint-active .key:is([data-digit="7"],[data-digit="8"],[data-digit="9"]):not(.lit){
+ background:#efe8d8;
+ box-shadow:inset 0 0 0 2px #7f9ec8;
+}
+/* Hover preserves the outlines without changing the keycap to a group color. */
+.device.round2-hint-active .key:is([data-digit="1"],[data-digit="2"],[data-digit="3"],[data-digit="4"],[data-digit="5"],[data-digit="6"],[data-digit="7"],[data-digit="8"],[data-digit="9"]):hover:not(.lit){
+ background:#fffaf0;
+}
+.device.round2-hint-active .key:is([data-digit="1"],[data-digit="2"],[data-digit="3"]).lit{
+ background:#f3ada4;border-bottom-color:#b7655d;
+ box-shadow:inset 0 0 0 2px #cc8179,0 0 11px #eb87797d;
+}
+.device.round2-hint-active .key:is([data-digit="4"],[data-digit="5"],[data-digit="6"]).lit{
+ background:#b9e4ad;border-bottom-color:#6c9a62;
+ box-shadow:inset 0 0 0 2px #82ae76,0 0 11px #87c77c7d;
+}
+.device.round2-hint-active .key:is([data-digit="7"],[data-digit="8"],[data-digit="9"]).lit{
+ background:#afcff4;border-bottom-color:#6a8fb9;
+ box-shadow:inset 0 0 0 2px #7e9fca,0 0 11px #85b5e77d;
+}
+
+/* Debug-only testing controls, never exposed during normal play. */
+.debug-controls{display:none;flex-wrap:wrap;align-items:center;gap:12px;margin-top:10px;padding:11px 12px;background:#b9b09d;border:1px solid #968d7b;border-radius:3px;color:#332e25;font:12px/1.4 Consolas,monospace}
+.device.debug .debug-controls{display:flex}
+.debug-controls label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;cursor:pointer}
+.debug-controls select{background:#efe8d8;color:#332e25;border:1px solid #968d7b;padding:4px 6px;font:inherit;cursor:pointer}
+.debug-controls input[type=checkbox]{accent-color:#536b46;cursor:pointer}
+.debug-controls .debug-hint-toggles{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+.qubi-phrase-gap{display:block;flex:0 0 13px;width:13px;height:1px;}
+
+/* Shared centered underline slots for rounds 1, 2, and 3. */
+.password-display,.word-display{padding:0 18px;gap:0;align-items:center;justify-content:center;}
+.device[data-round="2"] .monitor{gap:clamp(4px,1vw,13px);}
+.password-display,.word-current{gap:clamp(4px,1vw,13px);}
+.word-current{width:auto;}
+.password-cell,.device[data-round="2"] .progress-cell,.word-cell{
+ width:clamp(19px,4.4vw,44px);height:clamp(38px,7vw,66px);
+ border-bottom:2px solid var(--phos-dim);display:flex;align-items:center;justify-content:center;
+ padding:0;margin:0;box-sizing:border-box;
+ font:bold clamp(27px,5vw,49px)/1 "Courier New",monospace;
+ color:var(--phos);text-align:center;text-shadow:0 0 5px #57ff8a80;
+}
+.word-history{display:none;}
+@media(max-width:480px){
+ .password-display,.word-display{padding:0 10px;}
+ .password-display,.word-current{gap:4px;}
+ .device[data-round="2"] .monitor{gap:4px;}
+ .password-cell,.device[data-round="2"] .progress-cell,.word-cell{
+  width:clamp(19px,8vw,31px);height:43px;font-size:29px;
+ }
+}
+
+/* Round 3 takes priority over the persistent round 1 keypad glyphs. */
+.device[data-round="3"] .key .digit-glyph{display:none!important;}
+/* Round 3 hint: show Qubi numerals 0,1,2 repeated on keys 1–9, plus 0 on confirm. */
+.key .round3-digit-glyph{display:none;position:static;width:55%;height:55%;max-width:34px;max-height:34px;aspect-ratio:1/1;image-rendering:pixelated;pointer-events:none;opacity:.65;}
+.device.round3-hint-active[data-round="3"] .key .round3-digit-glyph{display:block;}
+.device.round3-hint-active[data-round="3"] .panel .key{display:flex;align-items:center;justify-content:center;padding:0;}
+.device.debug.round3-hint-active[data-round="3"] .key[data-digit]::after{display:none;}
+@media(max-width:480px){.key .round3-digit-glyph{width:57%;height:57%;max-width:34px;max-height:34px;}}
+
+/* Final celebration: preserve RANTYN and place the original cake alongside it. */
+.birthday-cake{display:none;width:clamp(65px,11vw,105px);height:clamp(65px,11vw,105px);image-rendering:pixelated;filter:drop-shadow(0 0 8px rgba(87,255,138,.5));flex-shrink:0;}
+.device.game-complete[data-round="3"] .word-display{display:flex;flex-direction:row;gap:clamp(7px,2vw,18px);}
+.device.game-complete[data-round="3"] .birthday-cake{display:block;}
+.device.game-complete[data-round="3"] .word-cell{width:clamp(17px,3.6vw,38px);height:clamp(38px,6vw,60px);font-size:clamp(23px,4vw,42px);}
+.device.game-complete[data-round="3"] .word-current{gap:clamp(2px,.7vw,8px);}
+@media(max-width:480px){.device.game-complete[data-round="3"] .word-display{padding:0 5px;gap:7px}.device.game-complete[data-round="3"] .birthday-cake{width:65px;height:65px}.device.game-complete[data-round="3"] .word-cell{width:clamp(17px,5.3vw,25px);height:42px;font-size:27px}.device.game-complete[data-round="3"] .word-current{gap:3px}}
+
+/* Secret translation mode, unlocked through the original-style LED password. */
+.power.secret-armed{background:#e4b765;box-shadow:0 0 8px #e4b765,0 0 3px #fff4d5;}
+.secret-prompt{display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.74);align-items:center;justify-content:center;padding:20px;}
+.secret-prompt.show{display:flex;}
+.secret-box{background:#0e1c16;border:2px solid #3c8f63;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 0 32px #000b;max-width:100%;}
+.secret-title{display:flex;gap:8px;align-items:center;justify-content:center;}
+.secret-title canvas{width:23px;height:23px;image-rendering:pixelated;}
+.secret-input{background:#08110d;color:#7af3a3;border:1px solid #37654a;outline:none;font:15px monospace;text-align:center;letter-spacing:2px;padding:9px 10px;width:min(260px,70vw);}
+.secret-input:focus{border-color:#91eab0;}
+/* Source game's small translation labels, revealed beneath each glyph. */
+.translation-glyph{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0;}
+.translation-glyph canvas{display:block;}
+.translation-label{display:none;color:var(--phos-dim,#6ab17b);font:9px/1.15 sans-serif;white-space:nowrap;text-shadow:none;}
+body.translation-on .translation-label{display:block;}
+body.translation-on .hint-dialog-text{height:auto;min-height:44px;align-items:flex-start;}
+body.translation-on .hint-dialog{min-height:48px;}
+body.translation-on .qubi-meta{grid-template-rows:24px minmax(48px,auto);}
+.qubi-name-translation{display:none;font:9px/1 sans-serif;color:var(--phos-dim,#6ab17b);}
+body.translation-on .qubi-name-translation{display:block;}
+body.translation-on .qubi-hud{align-items:flex-start;}
+@media(max-width:480px){.translation-label{font-size:8px}.secret-box{padding:18px}.translation-glyph{gap:1px}}
+
+/* Translation-mode labels for the hint confirmation choices. */
+.hint-choice-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.hint-choice-translation{display:none;color:var(--phos-dim,#6ab17b);font:9px/1.15 sans-serif;white-space:nowrap;text-shadow:none;}
+body.translation-on .hint-choice-translation{display:block;}
+@media(max-width:480px){.hint-choice-translation{font-size:8px;}}
+
+/* Align answer glyphs with the spoken Qubi glyph baseline, even with subtitles.
+   Keep the original untranslated button geometry untouched. */
+body.translation-on .hint-dialog,.hint-dialog.open:where(body.translation-on *){align-items:flex-start;}
+body.translation-on .hint-dialog-text{min-height:36px;height:36px;align-items:flex-start;}
+body.translation-on .hint-dialog-actions{align-items:flex-start;}
+body.translation-on .hint-choice{
+  min-height:40px;height:40px;padding:1px 8px 0;
+  align-items:flex-start;justify-content:center;
+}
+body.translation-on .hint-choice-content{position:relative;display:block;width:22px;height:22px;flex:none;}
+body.translation-on .hint-choice-content canvas{display:block;width:22px;height:22px;}
+body.translation-on .hint-choice-translation{
+ position:absolute;top:24px;left:50%;transform:translateX(-50%);
+ margin:0;line-height:1;pointer-events:none;
+}
+@media(max-width:480px){
+ body.translation-on .hint-choice{min-height:35px;height:35px;padding:1px 4px 0;}
+ body.translation-on .hint-choice-content{width:17px;height:17px;}
+ body.translation-on .hint-choice-content canvas{width:17px;height:17px;}
+ body.translation-on .hint-choice-translation{top:19px;}
+}
+
+
+/* Translation-mode labels for the hint trigger and keypad/source numeral glyphs. */
+.hint-trigger{overflow:visible;}
+.hint-trigger-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;pointer-events:none;}
+.hint-trigger-translation{display:none;color:var(--phos-dim,#6ab17b);font:9px/1.15 sans-serif;white-space:nowrap;text-shadow:none;}
+body.translation-on .hint-trigger-translation{display:block;}
+/* Visually center Qubi pixels within the full keycap (including the bottom key lip). */
+.key-glyph-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;display:none;align-items:center;justify-content:center;}
+.device.round1-hint-active:not([data-round="3"]) .key .round1-wrap{display:flex;}
+.device.round3-hint-active[data-round="3"] .key .round3-wrap{display:flex;}
+.key-glyph-wrap .translation-glyph{gap:1px;}
+.key-glyph-wrap .translation-label{color:#6a634f;font:8px/1 sans-serif;text-shadow:none;}
+.password-cell .translation-glyph{gap:1px;}
+.password-cell .translation-label{color:var(--phos-dim,#6ab17b);font:8px/1 sans-serif;text-shadow:none;}
+/* Translation labels must not change the vertical alignment of the centered password row. */
+body.translation-on .password-display{align-items:center;}
+body.translation-on .password-cell{padding-top:0;}
+@media(max-width:480px){.hint-trigger-translation{font-size:8px}.key-glyph-wrap .translation-label,.password-cell .translation-label{font-size:7px;}}
+
+/* Fixed-size glyph canvases: translation labels are absolutely overlaid,
+   never allowed to shrink or shift the source glyphs. */
+.key-glyph-wrap{width:100%;height:100%;}
+.key-glyph-wrap .translation-glyph{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.key-glyph-wrap .digit-glyph,
+.key-glyph-wrap .round3-digit-glyph{
+ position:static;display:block;width:55%;height:auto;aspect-ratio:1/1;
+ max-width:34px;max-height:34px;flex:none;transform:none;
+ image-rendering:pixelated;opacity:.65;
+}
+.key-glyph-wrap .translation-label{
+ position:absolute;left:50%;top:calc(50% + min(27.5%, 17px) + 2px);
+ transform:translateX(-50%);line-height:1;pointer-events:none;
+}
+.password-cell .translation-glyph{
+ position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+}
+.password-cell .password-glyph{width:min(74%, 36px);height:auto;aspect-ratio:1/1;flex:none;}
+.password-cell .translation-label{
+ position:absolute;left:50%;top:calc(100% + 5px);transform:translateX(-50%);
+ line-height:1;pointer-events:none;
+}
+@media(max-width:480px){
+ .key-glyph-wrap .digit-glyph,.key-glyph-wrap .round3-digit-glyph{width:57%;}
+}
+
+
+/* === TEAL / CYAN CRT THEME inspired by the reference photo === */
+:root{
+  --case:#cfc6b4;
+  --case-dark:#a89e8a;
+  --case-shadow:#7d7462;
+  --screen:#07121a;
+  --phos:#43e7df;
+  --phos-dim:#1f9697;
+  --phos-faint:#0c3237;
+  --amber:#ffd06e;
+}
+body{
+  background:
+    radial-gradient(ellipse at 50% 0%, #3e433f 0%, #252824 55%, #11120f 100%) !important;
+  color:var(--phos) !important;
+}
+.device{
+  background:#cfc6b4 !important;
+  border-top-color:#efe8d8 !important;
+  border-left-color:#e3dbc9 !important;
+  border-right-color:#a89e8a !important;
+  border-bottom-color:#7d7462 !important;
+  box-shadow:0 22px 55px #0008,inset 0 -6px 12px #0002 !important;
+}
+.vents i{background:#8f8674 !important; box-shadow:inset 0 1px 2px #0005 !important;}
+.power{
+  background:#d5a94b !important;
+  box-shadow:0 0 8px #e6ba59aa !important;
+}
+.round-lamps .lamp{
+  background:#8f8674 !important;
+  box-shadow:inset 0 1px 2px #0005 !important;
+}
+.round-lamps .lamp.on{
+  background:#9cc7ad !important;
+  box-shadow:inset 0 1px 1px #ffffffe0, 0 0 7px #b7d9c2aa !important;
+}
+.monitor-frame{
+  background:
+    linear-gradient(180deg,#0f1417 0%, #080c0f 100%) !important;
+  border-radius:11px !important;
+  box-shadow:inset 0 4px 10px #000b,inset 0 -2px 4px #fff1 !important;
+  border:none !important;
+  padding:14px !important;
+}
+.monitor{
+  background:
+    radial-gradient(ellipse at 50% 44%, #0f202a 0%, #09151c 43%, #060e14 72%, #02070a 100%) !important;
+  border-radius:9px !important;
+  box-shadow:
+    inset 0 0 85px #000d,
+    inset 0 0 12px #000,
+    0 0 2px #7ee7e8aa !important;
+}
+.monitor::before{
+  background:
+    repeating-linear-gradient(0deg,#00000038 0 1px,transparent 1px 3px),
+    linear-gradient(180deg,transparent 0%, #6ce5e508 35%, transparent 38%, #0000001f 54%, transparent 100%) !important;
+  opacity:.95 !important;
+}
+.monitor::after{
+  background:
+    radial-gradient(ellipse at 50% 45%, transparent 24%, #03111718 58%, #0000007d 100%),
+    radial-gradient(ellipse at 34% 10%, #b9ffff10, transparent 42%) !important;
+}
+.password-cell,
+.device[data-round="2"] .progress-cell,
+.word-cell{
+  color:var(--phos) !important;
+  border-bottom-color:color-mix(in srgb, var(--phos) 48%, transparent) !important;
+  text-shadow:0 0 5px #43e7df80, 0 0 12px #43e7df30 !important;
+}
+.word-history-row,.word-display,.win-title,.round2-win,.mini-cell,.hint-dialog,
+.hint-choice,.translation-label,.hint-choice-translation,.hint-trigger-translation,
+.qubi-name-translation,.password-cell .translation-label{
+  color:var(--phos-dim) !important;
+}
+.hint-dialog,.hint-choice,.word-history-row,.word-display,.round2-win,.mini-cell,.password-display{ text-shadow:none !important; }
+.star{color:#134f58 !important; text-shadow:none !important; opacity:1 !important;}
+.star.on{color:var(--phos) !important; text-shadow:0 0 8px #43e7df99, 0 0 20px #43e7df55 !important;}
+.qubi-face, .qubi-glyph, .hint-trigger canvas, .hint-dialog-text canvas, .hint-choice canvas,
+.password-glyph, .digit-glyph, .round3-digit-glyph, .birthday-cake{
+  filter:drop-shadow(0 0 3px #43e7df55) !important;
+}
+.hint-trigger{opacity:.46 !important;}
+.hint-trigger:hover,.hint-trigger:focus-visible{opacity:.65 !important;filter:none !important;}
+.hint-choice{
+  border-color:color-mix(in srgb, var(--phos) 40%, transparent) !important;
+  color:var(--phos) !important;
+  background:transparent !important;
+}
+.hint-choice:hover,.hint-choice:focus-visible,.hint-choice:active{
+  background:rgba(67,231,223,.08) !important;
+  border-color:color-mix(in srgb, var(--phos) 60%, transparent) !important;
+}
+.key.lit{
+  background:#ece7d7 !important;
+  box-shadow:inset 0 0 10px #d7fff880, 0 0 11px #74e7d75c !important;
+  border-bottom-color:#a99b83 !important;
+}
+/* Gameplay RGB hint colors remain intact. */
+.key.hint-red{box-shadow:inset 0 0 0 2px #d45e62 !important;}
+.key.hint-green{box-shadow:inset 0 0 0 2px #4fb57d !important;}
+.key.hint-blue{box-shadow:inset 0 0 0 2px #4fa6c9 !important;}
+.key.hint-red.lit{background:#d45e62 !important; box-shadow:inset 0 0 10px #ffd7da88,0 0 12px #d45e6288 !important;}
+.key.hint-green.lit{background:#4fb57d !important; box-shadow:inset 0 0 10px #d8ffe688,0 0 12px #4fb57d88 !important;}
+.key.hint-blue.lit{background:#4fa6c9 !important; box-shadow:inset 0 0 10px #dcf5ff88,0 0 12px #4fa6c988 !important;}
+
+
+/* === REFINED CYAN CRT + PALE GRAY HOUSING ===
+   5x5 glyph colors are set in the drawing routines, above. */
+:root{
+ --case:#c6c9cd; --case-dark:#90979d; --case-shadow:#666d74;
+ --screen:#07121a; --phos:#43e7df; --phos-dim:#268f98;
+ --phos-faint:#10333b;
+}
+body{background:radial-gradient(ellipse at 50% 0%,#444b50 0%,#252a2f 58%,#11151a 100%) !important;}
+.device{
+ background:linear-gradient(150deg,#d0d3d6 0%,#c3c7cb 60%,#babfc4 100%) !important;
+ border-top-color:#e8ebed !important;
+ border-left-color:#d9dde0 !important;
+ border-right-color:#959ba1 !important;
+ border-bottom-color:#777e85 !important;
+ box-shadow:0 22px 55px #0009,inset 0 -6px 12px #0002 !important;
+}
+.device-top .power{background:#80bec3 !important;box-shadow:0 0 7px #56cad299 !important;}
+.device-top .power.secret-armed{background:#e4b765 !important;box-shadow:0 0 8px #e4b765 !important;}
+.vents i,.round-lamps .lamp{background:#7f878f !important;}
+.round-lamps .lamp.on{background:#6ac5c9 !important;box-shadow:0 0 7px #43cbd0b0 !important;}
+.key-deck{background:#9ea5ab !important;box-shadow:inset 0 3px 7px #0004 !important;}
+.key,
+.device.round2-hint-active .key:is([data-digit="1"],[data-digit="2"],[data-digit="3"],[data-digit="4"],[data-digit="5"],[data-digit="6"],[data-digit="7"],[data-digit="8"],[data-digit="9"]):not(.lit){
+ background:#e0e3e5 !important;
+ border-bottom-color:#a7aeb4;
+}
+.key:hover:not(:disabled):not(.lit){background:#f1f3f4 !important;}
+.key.lit,.key.lit:hover:not(:disabled){
+ background:#48bac2 !important;
+ border-bottom-color:#27858d !important;
+ box-shadow:none !important;
+}
+
+/* RGB is intentional gameplay information in Round 2. */
+.device.round2-hint-active .key:is([data-digit="1"],[data-digit="2"],[data-digit="3"]).lit{background:#de7777 !important;border-bottom-color:#a94b50 !important;box-shadow:none !important;}
+.device.round2-hint-active .key:is([data-digit="4"],[data-digit="5"],[data-digit="6"]).lit{background:#72b881 !important;border-bottom-color:#3e8655 !important;box-shadow:none !important;}
+.device.round2-hint-active .key:is([data-digit="7"],[data-digit="8"],[data-digit="9"]).lit{background:#77a7d9 !important;border-bottom-color:#4776a7 !important;box-shadow:none !important;}
+.key-glyph-wrap .translation-label{color:#606a70 !important;}
+.debugbar,.placeholder,.debug-controls{color:#414a53 !important;}
+.device.debug .key::after,.device.debug .key.lit::after{color:#414a53 !important;}
+.debug-controls{background:#b6bdc3;border-color:#929aa3;}
+.debug-controls select{background:#e0e3e5;color:#414a53;border-color:#929aa3;}
+.debug-controls input[type=checkbox]{accent-color:#357d87;}
+/* All spoken words, hint buttons, translations and monitor readouts share cyan phosphor. */
+.hint-dialog,.hint-dialog-text,.hint-choice,.hint-trigger,.qubi-name,
+.word-display,.word-history-row,.round2-win,.win-title,.mini-cell{
+ color:var(--phos) !important;
+}
+.translation-label,.hint-choice-translation,.hint-trigger-translation,
+.qubi-name-translation{color:#4eb3ba !important;}
+.key-glyph-wrap .translation-label{color:#606a70 !important;}
+.hint-trigger{opacity:.47 !important;}
+.hint-trigger:hover,.hint-trigger:focus-visible{opacity:.65 !important;}
+.hint-dialog-text canvas,.hint-choice canvas,.qubi-face,.qubi-glyph,
+.hint-trigger canvas,.password-glyph,.birthday-cake{
+ filter:drop-shadow(0 0 4px #43e7df70) !important;
+}
+.birthday-cake{filter:drop-shadow(0 0 8px #43e7df80) !important;}
+.secret-box{background:#101f28;border-color:#397e87;}
+.secret-input{background:#07141a;color:#76dcdd;border-color:#397e87;}
+.secret-input:focus{border-color:#6fe1e0;}
+
+
+/* Restored original soft, full-key lighting (no miniature LED or solid fill). */
+.key.lit,.key.lit:hover:not(:disabled){
+ background:#c6e1e2 !important;
+ border-bottom-color:#78a4aa !important;
+ box-shadow:inset 0 0 12px #b7f9f5b0, 0 0 9px #66d9dc65 !important;
+}
+/* Maintain the established RGB gameplay hint, with soft lighting. */
+.device.round2-hint-active .key:is([data-digit="1"],[data-digit="2"],[data-digit="3"]).lit{
+ background:#e8b8bb !important;
+ border-bottom-color:#b87980 !important;
+ box-shadow:inset 0 0 12px #ffe6e6ad,0 0 9px #dc797a77 !important;
+}
+.device.round2-hint-active .key:is([data-digit="4"],[data-digit="5"],[data-digit="6"]).lit{
+ background:#b9dac1 !important;
+ border-bottom-color:#76aa85 !important;
+ box-shadow:inset 0 0 12px #e5ffe9ad,0 0 9px #73c28a77 !important;
+}
+.device.round2-hint-active .key:is([data-digit="7"],[data-digit="8"],[data-digit="9"]).lit{
+ background:#b6d3e9 !important;
+ border-bottom-color:#789dbd !important;
+ box-shadow:inset 0 0 12px #e6f4ffad,0 0 9px #75b1df77 !important;
+}
+
+
+/* === CYAN CRT + WARM AMBER / IVORY ACCENTS ===
+   Retains cold cyan CRT with a softly warm physical computer. */
+:root{
+  --case:#c9c8c5;
+  --case-dark:#a7a49e;
+  --case-shadow:#79766f;
+}
+.device{
+  background:linear-gradient(150deg,#d5d4d1 0%,#c8c7c4 58%,#bbb9b5 100%) !important;
+  border-top-color:#ecebe7 !important;
+  border-left-color:#dfddd7 !important;
+  border-right-color:#99958d !important;
+  border-bottom-color:#78746e !important;
+}
+.key-deck{
+  background:#a6a39e !important;
+  box-shadow:inset 0 3px 7px #0004 !important;
+}
+/* Warm ivory keys bring back the second major hue without turning the case yellow. */
+.key,
+.device.round2-hint-active .key:is([data-digit="1"],[data-digit="2"],[data-digit="3"],[data-digit="4"],[data-digit="5"],[data-digit="6"],[data-digit="7"],[data-digit="8"],[data-digit="9"]):not(.lit){
+  background:#ebe6da !important;
+  border-bottom-color:#aea598 !important;
+}
+.key:hover:not(:disabled):not(.lit){background:#faf4e7 !important;}
+.key-glyph-wrap .translation-label{color:#796e60 !important;}
+/* Warm incandescent glow rather than teal-filled keycaps. */
+.key.lit,.key.lit:hover:not(:disabled){
+  background:#eee0b9 !important;
+  border-bottom-color:#bca16d !important;
+  box-shadow:inset 0 0 11px #fff1caaf,0 0 9px #dfb76c70 !important;
+}
+/* Normal power LED matches the cyan status lamps. */
+.device-top .power:not(.secret-armed){
+  background:#56cad2 !important;
+  box-shadow:0 0 8px #56cad2af,0 0 3px #dfffff85 !important;
+}
+.round-lamps .lamp.on{
+  background:#56cad2 !important;
+  box-shadow:inset 0 1px 1px #dfffffbb,0 0 7px #56cad2a8 !important;
+}
+.vents i,.round-lamps .lamp{background:#898782 !important;}
+/* Right-click secret state is warm amber, unlike normal cyan. */
+.device-top .power.secret-armed{
+  background:#e4b46c !important;
+  box-shadow:0 0 9px #e4b46ce0,0 0 3px #fff0c7ad !important;
+}
+/* Still leave the Round 2 RGB puzzle semantics untouched. */
+
+
+/* Original Qubi computer's boot-time non-linguistic pixel noise. */
+.crt-boot-noise{
+  position:absolute;right:7%;left:auto;top:24%;width:35%;height:54%;z-index:1;
+  display:flex;flex-direction:column;justify-content:space-between;gap:8px;
+  pointer-events:none;opacity:.45;
+}
+.crt-boot-noise .noise{display:flex;width:100%;justify-content:space-between;gap:4px;}
+.crt-boot-noise .g{display:inline-flex;width:12px;height:12px;}
+.crt-boot-noise canvas{display:block;width:12px;height:12px;image-rendering:pixelated;}
+@media(max-width:480px){
+  .crt-boot-noise{right:6%;left:auto;top:27%;width:38%;height:48%;gap:5px;opacity:.38;}
+  .crt-boot-noise .noise{gap:2px;}
+  .crt-boot-noise .g,.crt-boot-noise canvas{width:8px;height:8px;}
+}
+
+
+/* === CLARITY BOOST: sharper cyan phosphor, clearer noise, less haze === */
+:root{ --phos:#59f6f0 !important; --phos-dim:#34a6ae !important; --phos-faint:#143f47 !important; }
+.monitor{
+  background:radial-gradient(ellipse at 50% 46%, #102632 0%, #0a1922 42%, #050d13 74%, #02070a 100%) !important;
+}
+.monitor::before{
+  background:
+    repeating-linear-gradient(0deg,#00000024 0 1px,transparent 1px 3px),
+    linear-gradient(180deg,transparent 0%, #6ce5e506 35%, transparent 38%, #00000014 54%, transparent 100%) !important;
+  opacity:.78 !important;
+}
+.monitor::after{
+  background:
+    radial-gradient(ellipse at 50% 45%, transparent 28%, #03111712 60%, #00000066 100%),
+    radial-gradient(ellipse at 34% 10%, #b9ffff0c, transparent 42%) !important;
+}
+.qubi-face,
+.password-glyph,
+.digit-glyph,
+.round3-digit-glyph,
+.hint-dialog-text canvas,
+.hint-choice canvas,
+.hint-trigger canvas,
+.birthday-cake{
+  filter:drop-shadow(0 0 1px #59f6f0cc) drop-shadow(0 0 4px #59f6f06e) !important;
+}
+.qubi-meta .qubi-glyph{filter:none !important; opacity:.42 !important;}
+.qubi-name,
+.word-display,
+.word-history-row,
+.password-display,
+.hint-dialog,
+.hint-choice,
+.hint-trigger,
+.translation-label,
+.hint-choice-translation,
+.hint-trigger-translation,
+.qubi-name-translation{
+  color:var(--phos-dim) !important;
+}
+.password-cell,
+.word-cell,
+.star.on,
+.round2-win,
+.round2-win .mini-cell,
+.round2-win .win-title{
+  color:var(--phos) !important;
+  text-shadow:0 0 3px #59f6f0a0,0 0 8px #59f6f04f !important;
+}
+.password-cell{border-bottom-color:#34a6aeaa !important;}
+.word-cell{border-bottom-color:#3caab09c !important;}
+.star{color:#17555f !important;}
+.crt-boot-noise{opacity:.52 !important;}
+.crt-boot-noise .noise{opacity:.92 !important;}
+.crt-boot-noise canvas{filter:drop-shadow(0 0 1px #59f6f055) !important;}
+
+
+/* Round 2 victory: one completed mini board centered beneath each of the three
+   underline slots. Draw a continuous hash (#) grid, not nine framed boxes. */
+.device[data-round="2"][data-winshow="1"] .win-boards{
+  position:absolute;
+  left:50%;right:auto;
+  top:calc(50% + 47px);bottom:auto;
+  transform:translateX(-50%);
+  width:max-content;
+  display:grid;
+  grid-template-columns:repeat(3,clamp(19px,4.4vw,44px));
+  column-gap:clamp(4px,1vw,13px);
+  align-items:start;
+  justify-items:center;
+}
+.device[data-round="2"] .mini-board{
+  position:relative;
+  width:clamp(27px,4.4vw,42px);
+  height:clamp(27px,4.4vw,42px);
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:0;
+  padding:0;
+  background:none;
+}
+.device[data-round="2"] .mini-board::before,
+.device[data-round="2"] .mini-board::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  box-sizing:border-box;
+  z-index:0;
+  border-color:#328d97a6;
+  border-style:solid;
+}
+.device[data-round="2"] .mini-board::before{
+  left:33.333%;top:0;width:33.333%;height:100%;
+  border-width:0 1px;
+}
+.device[data-round="2"] .mini-board::after{
+  left:0;top:33.333%;width:100%;height:33.333%;
+  border-width:1px 0;
+}
+.device[data-round="2"] .mini-cell{
+  width:100%;height:100%;min-width:0;min-height:0;
+  padding:0;margin:0;border:0;background:none;
+  position:relative;z-index:1;
+  font:bold clamp(7px,1.2vw,11px)/1 "Courier New",monospace;
+}
+@media(max-width:480px){
+  .device[data-round="2"][data-winshow="1"] .win-boards{
+    grid-template-columns:repeat(3,clamp(19px,8vw,31px));
+    column-gap:4px;
+    top:calc(50% + 33px);
+  }
+  .device[data-round="2"] .mini-board{width:clamp(23px,7vw,30px);height:clamp(23px,7vw,30px);}
+  .device[data-round="2"] .mini-cell{font-size:8px;}
+}
+
+/* Final screen: keep the six-letter word at its original screen center.
+   Cake is independent of word layout, so it never shifts the answer. */
+.device.game-complete[data-round="3"] .word-display{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  padding:0 18px;
+}
+.device.game-complete[data-round="3"] .word-current{
+  width:auto;
+  flex:0 0 auto;
+  gap:clamp(4px,1vw,13px);
+}
+.device.game-complete[data-round="3"] .word-cell{
+  width:clamp(19px,4.4vw,44px);
+  height:clamp(38px,7vw,66px);
+  font-size:clamp(27px,5vw,49px);
+}
+.device.game-complete[data-round="3"] .birthday-cake{
+  display:block;
+  position:absolute;
+  width:clamp(84px,13vw,132px);
+  height:clamp(84px,13vw,132px);
+  right:5%;
+  top:50%;
+  transform:translateY(-50%);
+}
+@media(max-width:480px){
+  .device.game-complete[data-round="3"] .word-display{padding:0 5px;}
+  .device.game-complete[data-round="3"] .word-current{gap:3px;}
+  .device.game-complete[data-round="3"] .word-cell{
+    width:clamp(17px,5.3vw,25px);
+    height:42px;
+    font-size:27px;
+  }
+  .device.game-complete[data-round="3"] .birthday-cake{
+    width:58px;height:58px;right:1%;
+  }
+}
+
+
+/* Keypad hint glyphs should stay flat with no cyan halo behind them. */
+.digit-glyph,
+.round3-digit-glyph{
+  filter:none !important;
+  box-shadow:none !important;
+}
+
+</style>
+</head>
+<body>
+<main class="device" data-round="1" aria-label="큐비의 역습">
+  <div class="device-top"><span class="power" id="power" title="" aria-label="전원 LED"></span><span class="vents round-lamps" id="roundLamps" aria-label="라운드 표시"><i class="lamp"></i><i class="lamp"></i><i class="lamp"></i></span></div>
+  <div class="monitor-frame"><div class="monitor" aria-label="라운드와 별 세 개"><div class="qubi-hud" aria-hidden="true"><canvas class="qubi-face" id="qubiFace" width="10" height="10"></canvas><span class="qubi-meta"><span class="translation-glyph"><canvas class="qubi-glyph" id="qubiGlyph" width="5" height="5"></canvas><span class="translation-label">큐비</span></span><span class="hint-dialog" id="hintDialog" role="group" aria-label="힌트 확인"><span class="hint-dialog-text" id="hintDialogText" aria-label="힌트 원하다 묻다" ></span><span class="hint-dialog-actions" id="hintDialogActions"><button type="button" class="hint-choice" id="hintYes" aria-label="응"><span class="hint-choice-content"><canvas id="hintYesGlyph" width="5" height="5" aria-hidden="true"></canvas><span class="hint-choice-translation" aria-hidden="true">응</span></span></button><button type="button" class="hint-choice" id="hintNo" aria-label="아니"><span class="hint-choice-content"><canvas id="hintNoGlyph" width="5" height="5" aria-hidden="true"></canvas><span class="hint-choice-translation" aria-hidden="true">아니</span></span></button></span></span></span></div><button type="button" class="hint-trigger" id="hintTrigger" aria-label="힌트 보기" aria-expanded="false"><span class="hint-trigger-content"><canvas id="hintTriggerGlyph" width="5" height="5" aria-hidden="true"></canvas><span class="hint-trigger-translation" aria-hidden="true">힌트</span></span></button><div class="crt-interference" aria-hidden="true"></div><div class="crt-boot-noise" id="crtBootNoise" aria-hidden="true"></div><div class="password-display" id="passwordDisplay" aria-label="8자리 암호 입력"><span class="password-cell"></span><span class="password-cell"></span><span class="password-cell"></span><span class="password-cell"></span><span class="password-cell"></span><span class="password-cell"></span><span class="password-cell"></span><span class="password-cell"></span></div><div class="word-display" id="wordDisplay"><div class="word-history" id="wordHistory"></div><div class="word-current" id="wordCurrent"></div><canvas class="birthday-cake" id="birthdayCake" width="32" height="32" aria-label="원작의 생일 케이크 픽셀 아트"></canvas></div><div class="round2-win" id="round2Win"><div class="win-boards" id="winBoards"></div></div><span class="star progress-cell"></span><span class="star progress-cell"></span><span class="star progress-cell"></span></div></div>
+  <div class="key-deck"><div class="panel" id="panel" aria-label="버튼 열 개"></div></div>
+  <div class="debugbar"><span id="debugStage">ROUND 1 / 3</span><span id="debugInput">INPUT: (empty)</span></div>
+  <div class="debug-controls" id="debugControls" aria-label="디버그 테스트 설정">
+    <label>라운드 <select id="debugRoundSelect" aria-label="이동할 라운드"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
+    <div class="debug-hint-toggles" aria-label="라운드별 힌트 활성화">
+      <label><input type="checkbox" data-debug-hint="1">1R 힌트</label>
+      <label><input type="checkbox" data-debug-hint="2">2R 힌트</label>
+      <label><input type="checkbox" data-debug-hint="3">3R 힌트</label>
+    </div>
+  </div>
+  <div class="placeholder" id="placeholder"></div>
+</main>
+<div class="secret-prompt" id="secretPrompt" role="dialog" aria-modal="true" aria-label="숨겨진 암호 입력" aria-hidden="true"><div class="secret-box"><div class="secret-title" id="secretTitle"></div><input id="secretInput" class="secret-input" type="password" autocomplete="off" spellcheck="false" aria-label="암호"><span id="secretFeedback" aria-live="polite" style="min-height:12px;color:#6dcfce;font:11px monospace"></span></div></div>
+<div id="explosion-flash" aria-hidden="true"></div><div id="explosion-dead" aria-hidden="true"><span id="explosion-dot"></span></div>
+<script>
+(()=>{
+'use strict';
+const SOURCE_WORDS=["나","너","우리","큐비","친구","사람","누구","모두","이것","그것","무엇","왜","어떻게","어디","언제","몇","뜻","이름","이다","아니다","있다","없다","하다","말하다","묻다","대답하다","알다","모르다","주다","받다","원하다","찾다","보다","듣다","열다","웃다","돌리다","누르다","좋다","싫다","맞다","틀리다","같다","다르다","크다","작다","재미있다","어렵다","특별하다","소중하다","그리고","또는","하지만","그래서","정말","아주","조금","다시","함께","제발","지금","오늘","내일","시간","날짜","분","여기","방","첫","마지막","안녕","응","아니","고마워","미안","축하","기쁨","슬픔","사랑","행복","마음","생각","기억","꿈","소원","비밀","생일","선물","케이크","먹다","음식","촛불","노래","파티","암호","금고","단어","순서","번째","힌트","와","전송","삭제"];
+const target='20261121';
+const passwordCells=[...document.querySelectorAll('#passwordDisplay .password-cell')];
+function renderPassword(length){
+ passwordCells.forEach((cell,i)=>{
+  const filled=i<length;
+  cell.replaceChildren();
+  if(round1Completed && round===1){
+   const wrap=document.createElement('span');
+   wrap.className='translation-glyph';
+   const glyph=document.createElement('canvas');
+   glyph.className='password-glyph';glyph.width=5;glyph.height=5;
+   glyph.setAttribute('aria-hidden','true');
+   drawPixelPattern(glyph,originalDigitPattern(Number(target[i])));
+   const label=document.createElement('span');
+   label.className='translation-label';
+   label.textContent=target[i];
+   wrap.append(glyph,label);
+   cell.appendChild(wrap);
+  }else if(filled)cell.textContent='*';
+  cell.classList.toggle('filled',filled);
+ });
+}
+const panel=document.getElementById('panel');
+const device=document.querySelector('.device');
+const stars=[...document.querySelectorAll('.star')];
+const debugStage=document.getElementById('debugStage');
+const roundLamps=[...document.querySelectorAll('#roundLamps .lamp')];
+const debugInput=document.getElementById('debugInput');
+const placeholder=document.getElementById('placeholder');
+const buttons=[];
+let round=1, entered='', soundContext, inputLocked=false, round1Completed=false, gameComplete=false;
+// Each round has its own hint threshold.
+const HINT_FAILURE_THRESHOLDS={1:10,2:10,3:5};
+const roundFailures={1:0,2:0,3:0};
+const debugHintOverrides={1:null,2:null,3:null};
+let board=Array(9).fill(null), wins=0, finished=false, aiTimer=null, roundTransitioning=false, tttWinShow=false, winSnapshots=[], qubiTotalWins=0;
+const wordAnswer='RANTYN';
+const wordCurrent=document.getElementById('wordCurrent');
+const wordHistory=document.getElementById('wordHistory');
+const round2Win=document.getElementById('round2Win');
+const winBoards=document.getElementById('winBoards');
+let wordInput='',wordGroups=[[],[],[]],hintRunning=false;
+
+let exploded=false, ledClicks=0, ledClickTimer=null;
+const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+const qubiFaceCanvas=document.getElementById('qubiFace');
+const qubiGlyphCanvas=document.getElementById('qubiGlyph');
+// Original upright Qubi frames; the second frame closes its eyes for blinking.
+const QUBI_ORIGINAL_FRAMES=[
+ ['11111','10101','11111','10001','11111'],
+ ['11111','11111','11111','10001','11111']
+];
+// Render the original 5x5 design on a 10x10 pixel canvas: every source
+// pixel becomes a 2x2 block, without changing Qubi's square silhouette.
+function doubleQubiPixels(frame){
+ return frame.flatMap(row=>{
+  const doubled=[...row].map(pixel=>pixel+pixel).join('');
+  return [doubled,doubled];
+ });
+}
+const QUBI_FRAMES=QUBI_ORIGINAL_FRAMES.map(doubleQubiPixels);
+const QUBI_GLYPH=[
+ '10101',
+ '01010',
+ '01110',
+ '10001',
+ '00000'
+];
+function drawPixelPattern(canvas, rows, color='#43e7df'){
+ const ctx=canvas.getContext('2d');
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ rows.forEach((row,y)=>{
+   [...row].forEach((v,x)=>{
+     if(v==='1'){ctx.fillStyle=color;ctx.fillRect(x,y,1,1);}
+   });
+ });
+}
+drawPixelPattern(qubiFaceCanvas, QUBI_FRAMES[0]);
+drawPixelPattern(qubiGlyphCanvas, QUBI_GLYPH);
+let qubiReactTimer=null;
+function qubiReaction(duration=140){
+ if(exploded)return;
+ if(qubiReactTimer!==null)clearTimeout(qubiReactTimer);
+ // Only change Qubi's eye pixels at the exact instant of its key light + sound.
+ drawPixelPattern(qubiFaceCanvas,QUBI_FRAMES[1]);
+ qubiReactTimer=setTimeout(()=>{
+  qubiReactTimer=null;
+  drawPixelPattern(qubiFaceCanvas,QUBI_FRAMES[0]);
+ },duration);
+}
+function qubiResetFace(){
+ if(qubiReactTimer!==null){clearTimeout(qubiReactTimer);qubiReactTimer=null;}
+ drawPixelPattern(qubiFaceCanvas,QUBI_FRAMES[0]);
+}
+// Original blink: alternate open/closed eyes for 140ms, then reopen.
+// Randomized intervals prevent the animation from feeling mechanical.
+function scheduleQubiBlink(){
+ const delay=3200+Math.random()*2500;
+ setTimeout(()=>{
+   if(!exploded){
+     if(qubiReactTimer===null){
+      drawPixelPattern(qubiFaceCanvas,QUBI_FRAMES[1]);
+      setTimeout(()=>{if(qubiReactTimer===null)drawPixelPattern(qubiFaceCanvas,QUBI_FRAMES[0]);},140);
+     }
+     scheduleQubiBlink();
+   }
+ },delay);
+}
+scheduleQubiBlink();
+
+for(const i of [1,2,3,4,5,6,7,8,9,0]){
+ const digit=String(i); // Visual order: 1 2 3 4 5 6 7 8 9 0
+ const button=document.createElement('button');
+ button.type='button';button.className='key';button.dataset.digit=digit;button.dataset.mark=digit;
+ button.setAttribute('aria-label',`버튼 ${digit}`);
+ button.addEventListener('click',()=>press(digit,button));
+ panel.appendChild(button);buttons[i]=button; // Keep array indexed by digit, not visual position.
+}
+
+function renderWinBoards(){
+ winBoards.replaceChildren();
+ const snapshots = winSnapshots.length ? winSnapshots : [Array(9).fill(null),Array(9).fill(null),Array(9).fill(null)];
+ snapshots.slice(0,3).forEach(state=>{
+  const mini=document.createElement('div');
+  mini.className='mini-board';
+  for(let i=0;i<9;i++){
+   const cell=document.createElement('span');
+   cell.className='mini-cell';
+   if(state[i]==='O')cell.classList.add('o');
+   else if(state[i]==='X')cell.classList.add('x');
+   mini.appendChild(cell);
+  }
+  winBoards.appendChild(mini);
+ });
+}
+// Round 3: a three-digit base-3 typewriter.
+// The 1/2/3, 4/5/6, 7/8/9 groups represent the 9s, 3s, and 1s places.
+// Within each group, left-to-right means ternary digit 0/1/2.
+// 000 (keys 147) is displayed as '-', and 001..222 (148..369) mean A..Z.
+// Missing or multiple selections in a group are invalid and also display '-'.
+function keysToLetter(groups){
+ if(!groups.every(group=>group.length===1))return '-';
+ const [[a],[b],[c]]=groups;
+ const ordinal=(a-1)*9+(b-4)*3+(c-7);
+ return ordinal===0?'-':String.fromCharCode(64+ordinal);
+}
+function keysForLetter(letter){
+ const ordinal=letter.charCodeAt(0)-64; // A=1, ..., Z=26: no subtraction of 1.
+ if(!Number.isInteger(ordinal)||ordinal<1||ordinal>26)return [1,4,7];
+ return [1+Math.floor(ordinal/9),4+Math.floor(ordinal%9/3),7+ordinal%3];
+}
+function renderWord(){
+ wordCurrent.replaceChildren();
+ for(let i=0;i<6;i++){
+  const cell=document.createElement('span');
+  cell.className='word-cell';
+  const character=wordInput[i];
+  cell.textContent=character||'';
+  wordCurrent.appendChild(cell);
+ }
+ wordHistory.replaceChildren();
+ buttons.forEach((button,i)=>{
+  button.classList.toggle('lit',wordGroups.some(group=>group.includes(i)));
+  button.disabled=false;
+ });
+ updateDebug();
+}
+function wordPress(digit){
+ if(hintRunning||inputLocked)return;
+ const n=Number(digit);
+ if(n===0){
+  const letter=keysToLetter(wordGroups);
+  originalSendSound();
+  wordInput+=letter;
+  wordGroups=[[],[],[]];
+  if(wordInput.length===6){
+   if(wordInput===wordAnswer){
+    finishBirthdayGame();
+    return;
+   }
+   recordRoundFailure();
+   inputLocked=true;
+   renderWord();
+   setTimeout(()=>{
+    if(exploded||round!==3)return;
+    failureSound();
+    wordInput='';
+    inputLocked=false;
+    renderWord();
+   },350);
+   return;
+  }
+  renderWord();return;
+ }
+ const group=n<=3?0:n<=6?1:2;
+ const selected=wordGroups[group].indexOf(n);
+ if(selected!==-1){
+  // Pressing an illuminated key again cancels that selection.
+  wordGroups[group].splice(selected,1);
+  acceptedSound();
+ }else{
+  acceptedSound();
+  wordGroups[group].push(n); // Multiple keys per group may be selected, making the combination invalid.
+ }
+ renderWord();
+}
+function beginWordRound(){
+ wordInput='';wordGroups=[[],[],[]];
+ placeholder.textContent='';inputLocked=false;
+ renderWord();
+}
+// The original computer's 5x5 glyph algorithm, with the original word seeds.
+// "힌트" (seed 100), "원하다" (seed 31), "응" (seed 72), "아니" (seed 73).
+// Numerals copied from the original Qubi computer: base-five marker system.
+// The lower row marks a number; the upper bar means five and center row is 1–4.
+function originalDigitPattern(n){
+ const five=n>=5, units=n%5;
+ const rows=['00000','00000','00000','00000','11111'];
+ if(five)rows[0]='11111';
+ const mid=['0','0','0','0','0'];
+ for(let k=0;k<units;k++)mid[k]='1';
+ rows[2]=mid.join('');
+ return rows;
+}
+// Exact 32-pixel cake artwork and congratulatory glyph sequence from the source game.
+const BIRTHDAY_CAKE=[
+"................................",
+"..........1.....1...............",
+".........111...111....1.........",
+"..........1.....1....111........",
+"..........2.....2.....1.........",
+"..........2.....2.....2.........",
+"..........2.....2.....2.........",
+"................................",
+"......22222222222222222222......",
+".....2222222222222222222222.....",
+".....2121212121212121212122.....",
+".....2222222222222222222222.....",
+"....222222222222222222222222....",
+"....211112111121111211112112....",
+"....222222222222222222222222....",
+"...22222222222222222222222222...",
+"...22222222222222222222222222...",
+"...21212121212121212121212122...",
+"...22222222222222222222222222...",
+"..1111111111111111111111111111..",
+"................................",
+"....1.......1........1......1...",
+"...111.....111......111....111..",
+"....1.......1........1......1..."];
+function drawBirthdayCake(){
+ const canvas=document.getElementById('birthdayCake');
+ const ctx=canvas.getContext('2d');
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ BIRTHDAY_CAKE.forEach((row,y)=>[...row].forEach((ch,x)=>{
+  if(ch==='1'||ch==='2'){
+   ctx.fillStyle=ch==='1'?'#a2ffff':'#43e7df';
+   ctx.fillRect(x,y,1,1);
+  }
+ }));
+}
+function finishBirthdayGame(){
+ if(gameComplete||exploded)return;
+ gameComplete=true;
+ inputLocked=true;
+ wordGroups=[[],[],[]];
+ renderWord(); // Draw the sixth letter before the celebration begins.
+ clearLights();
+ stopHintTyping();
+ hintOpen=false;hintDialogActions.hidden=true;
+ hintTrigger.hidden=true;
+ pendingQubiAnnouncement=null;
+ drawBirthdayCake();
+ device.classList.add('game-complete');
+ finalClearSound(); // Complete source unlock sound, not the four-note round-clear cue.
+ sayQubi([87,55,76,77,77,77,101,101,101],'생일 정말 축하 기쁨 기쁨 기쁨 와 와 와');
+ animateQubiJoy();
+ updateDebug();
+}
+function ensureKeyGlyph(button,wrapClass,canvasClass,labelText){
+ let wrap=button.querySelector('.'+wrapClass);
+ let canvas,label;
+ if(!wrap){
+  wrap=document.createElement('span');
+  wrap.className='key-glyph-wrap '+wrapClass;
+  const inner=document.createElement('span');
+  inner.className='translation-glyph';
+  canvas=document.createElement('canvas');
+  canvas.className=canvasClass;
+  canvas.width=5;canvas.height=5;
+  canvas.setAttribute('aria-hidden','true');
+  label=document.createElement('span');
+  label.className='translation-label';
+  inner.append(canvas,label);
+  wrap.appendChild(inner);
+  button.appendChild(wrap);
+ }else{
+  canvas=wrap.querySelector('canvas');
+  label=wrap.querySelector('.translation-label');
+ }
+ label.textContent=labelText;
+ return canvas;
+}
+function revealRoundTwoColorHint(){
+ device.classList.add('round2-hint-active');
+}
+function revealRoundOneNumberHint(){
+ device.classList.add('round1-hint-active');
+ buttons.forEach((button,n)=>{
+  const canvas=ensureKeyGlyph(button,'round1-wrap','digit-glyph',String(n));
+  drawPixelPattern(canvas,originalDigitPattern(n),'#544d40');
+  button.classList.add('hint-number');
+ });
+}
+function revealRoundThreeNumberHint(){
+ device.classList.add('round3-hint-active');
+ for(let n=0;n<=9;n++){
+  const button=buttons[n];
+  const text=n===0?'전송':String((n-1)%3);
+  const canvas=ensureKeyGlyph(button,'round3-wrap','round3-digit-glyph',text);
+  if(n===0){
+   // The dedicated '전송' rune spans four columns, not five.
+   // Center its ink in the same square canvas as the numeral glyphs.
+   canvas.width=10;canvas.height=10;
+   const ctx=canvas.getContext('2d');
+   const rows=originalGlyph(SOURCE_WORDS.indexOf('전송')+1);
+   ctx.clearRect(0,0,10,10);
+   ctx.fillStyle='#544d40';
+   rows.forEach((row,y)=>[...row].forEach((v,x)=>{
+    if(v==='1')ctx.fillRect(x*2+1,y*2,2,2);
+   }));
+  }else{
+   canvas.width=5;canvas.height=5;
+   drawPixelPattern(canvas,originalDigitPattern((n-1)%3),'#544d40');
+  }
+ }
+}
+function originalGlyph(seed){
+ // In the source game these two word glyphs use dedicated UI runes,
+ // not the procedurally generated symmetric word glyphs.
+ if(seed===SOURCE_WORDS.indexOf('전송')+1)
+  return ["11000","10000","10011","10000","11000"];
+ if(seed===SOURCE_WORDS.indexOf('삭제')+1)
+  return ["11111","01101","00110","00100","00000"];
+ function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+ for(let attempt=0;;attempt++){
+  const rnd=rng(seed*7919+attempt*104729+13);
+  const g=Array.from({length:5},()=>Array(5).fill(0));
+  let on=0;
+  for(let y=0;y<5;y++)for(let x=0;x<3;x++){
+   const v=rnd()<.46?1:0;
+   g[y][x]=v;g[y][4-x]=v;
+   if(v)on+=(x===2?1:2);
+  }
+  if(on>=7&&on<=18)return g.map(row=>row.join(''));
+ }
+}
+const hintTrigger=document.getElementById('hintTrigger');
+function updateHintAvailability(){
+ const cleared=gameComplete||(round===1&&round1Completed)||(round===2&&tttWinShow);
+ const availability=debugHintOverrides[round]===null
+  ? roundFailures[round]>=HINT_FAILURE_THRESHOLDS[round]
+  : debugHintOverrides[round];
+ hintTrigger.hidden=exploded||cleared||round<1||round>3||!availability;
+}
+function recordRoundFailure(){
+ if(round>=1&&round<=3){roundFailures[round]++;updateHintAvailability();}
+}
+const hintDialog=document.getElementById('hintDialog');
+const hintDialogText=document.getElementById('hintDialogText');
+const hintDialogActions=document.getElementById('hintDialogActions');
+drawPixelPattern(document.getElementById('hintTriggerGlyph'),originalGlyph(100));
+drawPixelPattern(document.getElementById('hintYesGlyph'),originalGlyph(72));
+drawPixelPattern(document.getElementById('hintNoGlyph'),originalGlyph(73));
+let hintOpen=false,hintTypingTimer=null,hintChoiceTimer=null,hintDialogueToken=0,pendingQubiJoy=false,qubiJoyTimer=null;
+function stopHintTyping(){
+ hintDialogueToken++;
+ if(hintTypingTimer!==null){clearTimeout(hintTypingTimer);hintTypingTimer=null;}
+ if(hintChoiceTimer!==null){clearTimeout(hintChoiceTimer);hintChoiceTimer=null;}
+}
+function hintTick(){
+ try{originalBeep(880,.025,'square',.035);}
+ catch(e){/* Muted browsers still display the text. */}
+}
+function streamHintGlyphs(seeds,showChoices=true){
+ stopHintTyping();
+ const token=hintDialogueToken;
+ hintDialogActions.hidden=true;
+ hintDialogText.replaceChildren();
+ let i=0;
+ function next(){
+  if(!hintDialog.classList.contains('open')||token!==hintDialogueToken)return;
+  const glyph=seeds[i++];
+  if(glyph===null){
+   // A slightly wider separation between the two phrases, not a spoken glyph.
+   const gap=document.createElement('span');
+   gap.className='qubi-phrase-gap';
+   gap.setAttribute('aria-hidden','true');
+   hintDialogText.appendChild(gap);
+  }else{
+   const canvas=document.createElement('canvas');
+   canvas.width=5;canvas.height=5;
+   drawPixelPattern(canvas,typeof glyph==='object'&&'digit' in glyph
+    ? originalDigitPattern(glyph.digit) : originalGlyph(glyph));
+   const wrap=document.createElement('span');
+   wrap.className='translation-glyph';
+   const label=document.createElement('span');
+   label.className='translation-label';
+   label.textContent=typeof glyph==='object'&&'digit' in glyph
+    ? String(glyph.digit) : (SOURCE_WORDS[glyph-1]||'');
+   wrap.append(canvas,label);
+   hintDialogText.appendChild(wrap);
+   hintTick();
+  }
+  // Keep the same short typing interval for repeated words as for ordinary speech.
+  if(i<seeds.length)hintTypingTimer=setTimeout(next,130);
+  else{
+   hintTypingTimer=null;
+   if(showChoices){
+    hintChoiceTimer=setTimeout(()=>{
+     hintChoiceTimer=null;
+     if(hintOpen&&token===hintDialogueToken)hintDialogActions.hidden=false;
+    },400);
+   }
+  }
+ }
+ next();
+}
+// Reusable Qubi announcements, using the source game's word-glyph seeds.
+// A pending hint question remains open until answered; announcements wait for it.
+let pendingQubiAnnouncement=null;
+function sayQubi(seeds,label){
+ if(hintOpen){pendingQubiAnnouncement={seeds,label};return;}
+ hintDialog.classList.add('open');
+ hintDialog.setAttribute('aria-label',label);
+ streamHintGlyphs(seeds,false);
+}
+function sayRoundClear(){sayQubi([76,76,76],'축하 축하 축하');animateQubiJoy();}
+function sayRoundStart(which){
+ if(which===2){
+  // Number 2 uses the source numeral glyph (rather than the word glyph table).
+  sayQubi([{digit:2},99,95],'2 번째 암호');
+ }else if(which===3){sayQubi([70,95,null,2,18,25],'마지막 암호 너 이름 묻다');}
+}
+function animateQubiJoy(){
+ // Subtle, stepwise vertical hops. Do not replace the active dialogue.
+ if(qubiJoyTimer!==null)clearTimeout(qubiJoyTimer);
+ qubiFaceCanvas.classList.remove('qubi-joy');
+ void qubiFaceCanvas.offsetWidth; // Restart the animation for each celebration.
+ qubiFaceCanvas.classList.add('qubi-joy');
+ qubiJoyTimer=setTimeout(()=>{qubiFaceCanvas.classList.remove('qubi-joy');qubiJoyTimer=null;},1320);
+}
+function showQubiJoy(){
+ if(hintOpen){pendingQubiJoy=true;return;}
+ pendingQubiJoy=false;
+ hintDialog.classList.add('open');
+ hintDialog.setAttribute('aria-label','기쁨 기쁨 기쁨');
+ animateQubiJoy();
+ streamHintGlyphs([77,77,77],false);
+}
+function playOpeningGreeting(){
+ // Original word glyphs: 안녕 나 큐비 오늘 너 생일 축하.
+ // The greeting uses the same dialogue line, but never shows reply buttons.
+ hintDialog.classList.add('open');
+ hintDialog.setAttribute('aria-label','안녕 나 큐비 오늘 너 생일 축하');
+ hintDialogActions.hidden=true;
+ streamHintGlyphs([71,1,4,62,2,87,76],false);
+}
+function setHintOpen(open){
+ stopHintTyping();
+ hintOpen=open;
+ hintDialog.classList.toggle('open',open);
+ hintTrigger.setAttribute('aria-expanded',String(open));
+ if(open){
+  hintDialogActions.hidden=true;
+  const question = round===1
+   ? ['너','첫','번째','힌트','원하다','묻다']
+   : round===2
+    ? ['너','2','번째','힌트','원하다','묻다']
+    : ['너','마지막','번째','힌트','원하다','묻다'];
+  hintDialog.setAttribute('aria-label',question.join(' '));
+  const questionGlyphs=round===1?[2,69,99,100,31,25]
+   :round===2?[2,{digit:2},99,100,31,25]
+   :[2,70,99,100,31,25];
+  streamHintGlyphs(questionGlyphs);
+ }else{
+  hintDialogText.replaceChildren();
+  if(pendingQubiAnnouncement){
+   const announcement=pendingQubiAnnouncement;
+   pendingQubiAnnouncement=null;
+   sayQubi(announcement.seeds,announcement.label);
+  }else if(pendingQubiJoy && round===2)setTimeout(showQubiJoy,0);
+ }
+}
+hintTrigger.addEventListener('click',()=>{if(!hintTrigger.hidden&&!exploded&&!hintOpen)setHintOpen(true);});
+hintDialog.addEventListener('click',e=>e.stopPropagation());
+document.getElementById('hintNo').addEventListener('click',()=>setHintOpen(false));
+document.getElementById('hintYes').addEventListener('click',()=>{
+ // Accepting the hint ends the pending question, but keeps Qubi's dialogue visible.
+ // Otherwise hintOpen stays true forever and queues round-clear announcements.
+ hintOpen=false;
+ hintTrigger.setAttribute('aria-expanded','false');
+ if(round===1){
+  // Do not dismiss the Qubi dialogue; only the '아니' button closes it.
+  revealRoundOneNumberHint();
+  hintDialog.setAttribute('aria-label','오늘 너 생일 축하');
+  streamHintGlyphs([62,2,87,76],false);
+  return;
+ }
+ if(round===2){
+  revealRoundTwoColorHint();
+  hintDialog.setAttribute('aria-label','이것 이다 2 번째 힌트');
+  streamHintGlyphs([9,19,{digit:2},99,100],false);
+  return;
+ }
+ // Round 3 hint reveals the ternary labels on the keypad, not H-I-N-T flashes.
+ revealRoundThreeNumberHint();
+ hintDialog.setAttribute('aria-label','큐비 원하다 너 이름 전송');
+ streamHintGlyphs(['큐비','원하다','너','이름','전송'].map(word=>SOURCE_WORDS.indexOf(word)+1),false);
+});
+// A short cue synchronized with the four QUBI/HINT button flashes.
+function flashPatternSound(){
+ try{originalBeep(440,.075,'square',.037);}catch(e){/* Audio is optional. */}
+}
+// Round 3: demonstration lights only; never enter letters or change selections.
+async function flashLetterPatterns(patterns){
+ if(round!==3||exploded||gameComplete||hintRunning)return;
+ hintRunning=true;
+ const activeRound=round;
+ const saved=wordGroups.flat();
+ const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ try{
+  for(const pattern of patterns){
+   if(exploded||round!==activeRound)break;
+   buttons.forEach((b,i)=>b.classList.toggle('lit',saved.includes(i)||pattern.includes(i)));
+   // Each group of simultaneously flashing keys gets its own light, positive cue.
+   flashPatternSound();
+   await pause(460);
+   if(exploded||round!==activeRound)break;
+   buttons.forEach((b,i)=>b.classList.toggle('lit',saved.includes(i)));
+   await pause(230);
+  }
+ }finally{
+  hintRunning=false;
+  if(!exploded&&round===activeRound)renderWord();
+ }
+}
+// Qubi itself stays visually inert on hover, but clicking its face demonstrates QUBI.
+qubiFaceCanvas.addEventListener('click',()=>{
+ if(round!==3||exploded||gameComplete||hintRunning||hintOpen)return;
+ sayQubi([1,18,19,4],'나 이름 이다 큐비');
+ void flashLetterPatterns('QUBI'.split('').map(keysForLetter));
+});
+function updateDebug(){
+ device.dataset.round=String(round);
+ updateHintAvailability();
+ device.dataset.winshow = tttWinShow ? '1' : '0';
+ debugStage.textContent=gameComplete?'COMPLETE / 3':`ROUND ${round} / 3`;
+ document.getElementById('debugRoundSelect').value=String(round);
+ roundLamps.forEach((lamp,i)=>{
+   // Three lamps indicate the three completed rounds.
+   lamp.classList.toggle('on', gameComplete || i < Math.min(round-1,3));
+   lamp.classList.toggle('current', false);
+ });
+ // Tic-tac-toe streak: three masked password-style slots, one * per consecutive win.
+ stars.forEach((star,i)=>{
+  const lit=round===2 && i<wins;
+  star.textContent=lit?'*':'';
+  star.classList.toggle('on',lit);
+ });
+ if(round===1)debugInput.textContent=`INPUT: ${entered||'(empty)'}`;
+ else if(round===2)debugInput.textContent=`WINS: ${wins}/3 · QUBI WINS: ${qubiTotalWins} · ${finished?'GAME OVER':'PLAYING'}`;
+ else if(round===3)debugInput.textContent=gameComplete?'WORD: RANTYN · COMPLETE':`WORD: ${wordInput||'(empty)'} · TARGET: ${wordAnswer} · SELECTED: ${wordGroups.map(g=>g.join('+')||'·').join(',')}`;
+ else debugInput.textContent='';
+ renderPassword(round===1?entered.length:0);
+ panel.classList.toggle('ttt',round===2);
+ buttons.forEach((button,i)=>{
+   const mark=round===2&&i>0?board[i-1]:null;
+   button.dataset.mark=mark||button.dataset.digit;
+ });
+}
+function renderBoard(){
+ panel.classList.toggle('ttt',round===2);
+ buttons.forEach((button,i)=>{
+  button.classList.toggle('lit',i>0&&board[i-1]!==null);
+  // Keep the physical key press available even on occupied cells or after game over.
+  // Game logic below still ignores all non-reset inputs when finished.
+  button.disabled=round!==2 && round!==3;
+ });
+ updateDebug();
+}
+function outcome(state){
+ for(const line of lines){const [a,b,c]=line;if(state[a]&&state[a]===state[b]&&state[a]===state[c])return state[a];}
+ return state.every(Boolean)?'draw':null;
+}
+function minimax(state,turn,depth){
+ const end=outcome(state);
+ if(end==='X')return {score:10-depth};
+ if(end==='O')return {score:depth-10};
+ if(end==='draw')return {score:0};
+ let best={score:turn==='X'?-Infinity:Infinity,index:-1};
+ for(let i=0;i<9;i++){
+  if(state[i])continue;
+  state[i]=turn;
+  const score=minimax(state,turn==='X'?'O':'X',depth+1).score;
+  state[i]=null;
+  if((turn==='X'&&score>best.score)||(turn==='O'&&score<best.score))best={score,index:i};
+ }
+ return best;
+}
+// Find an immediate three-in-a-row opportunity without mutating the live board.
+function immediateWinningMove(state,mark){
+ for(const [a,b,c] of lines){
+  const line=[a,b,c];
+  if(line.filter(i=>state[i]===mark).length!==2)continue;
+  const empty=line.find(i=>state[i]===null);
+  if(empty!==undefined)return empty;
+ }
+ return -1;
+}
+function aiMove(){
+ if(round!==2||finished||!inputLocked)return;
+ let position=immediateWinningMove(board,'X'); // 1. Take a win now if possible.
+ if(position<0)position=immediateWinningMove(board,'O'); // 2. Otherwise block a one-move win.
+ if(position<0){
+  // Keep the deliberately imperfect opening only when no immediate threat exists.
+  if(board.filter(Boolean).length===1&&board[4]==='O'){
+   const edges=[1,3,5,7];position=edges[Math.floor(Math.random()*edges.length)];
+  }else position=minimax(board.slice(),'X',0).index;
+ }
+ if(position>=0&&board[position]===null){
+  board[position]='X';
+  qubiReaction(140); // Brief eye blink exactly when Qubi places its mark.
+  qubiMoveSound();   // Distinct from player's short confirmation sound.
+ }
+ inputLocked=false;
+ settleBoard();
+}
+function settleBoard(){
+ const result=outcome(board);
+ if(result){
+  finished=true;
+  if(result==='O'){
+   wins++;
+   if(wins<3)ticTacToeWinSound(); // Each individual win gets a cheerful, brief cue.
+   winSnapshots.push(board.slice());
+   if(winSnapshots.length>3)winSnapshots=winSnapshots.slice(-3);
+   if(wins>=3){
+    clearSound();
+    sayRoundClear();
+    roundTransitioning=true;
+    tttWinShow=true;
+    updateHintAvailability();
+    renderWinBoards();
+    renderBoard(); // The victory screen remains inside the CRT until the next key press.
+    return;
+   }
+  }else{
+   // A loss or draw breaks the consecutive-win streak.
+   wins=0;
+   winSnapshots=[];
+   recordRoundFailure();
+   renderWinBoards();
+   if(result==='X'){
+    ticTacToeLoseSound(); // Rough three-note descending defeat cue.
+    qubiTotalWins++;
+    if(qubiTotalWins % 7 === 0){
+     showQubiJoy();
+    }
+   }
+  }
+ }
+ renderBoard();
+ if(round===3)beginWordRound();
+}
+function ticTacToePress(digit){
+ if(roundTransitioning)return;
+ if(digit==='0'){
+  ticTacToeResetSound();
+  if(aiTimer!==null){clearTimeout(aiTimer);aiTimer=null;}
+  qubiResetFace();
+  board=Array(9).fill(null);finished=false;inputLocked=false;
+  renderBoard();return;
+ }
+ if(inputLocked||finished)return;
+ const index=Number(digit)-1;
+ if(board[index])return;
+ acceptedSound();
+ board[index]='O';
+ const result=outcome(board);
+ if(result){settleBoard();return;}
+ inputLocked=true;
+ renderBoard();
+ aiTimer=setTimeout(()=>{aiTimer=null;aiMove();},450);
+}
+
+function clearLights(){buttons.forEach(b=>b.classList.remove('lit'));}
+const keyFlashTimers=new WeakMap();
+function flashRoundOneKey(button){
+ const prior=keyFlashTimers.get(button);
+ if(prior!==undefined)clearTimeout(prior);
+ button.classList.add('lit');
+ const timer=setTimeout(()=>{
+  keyFlashTimers.delete(button);
+  if(round===1)button.classList.remove('lit');
+ },150);
+ keyFlashTimers.set(button,timer);
+}
+// Quiet CRT-style acknowledgement; only played for input the game accepts.
+function playTone(frequency, when, duration, volume, type='sine'){
+ const oscillator=soundContext.createOscillator(), gain=soundContext.createGain();
+ oscillator.type=type;
+ oscillator.frequency.setValueAtTime(frequency,when);
+ gain.gain.setValueAtTime(.0001,when);
+ gain.gain.linearRampToValueAtTime(volume,when+.008);
+ gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
+ oscillator.connect(gain).connect(soundContext.destination);
+ oscillator.start(when);oscillator.stop(when+duration+.015);
+}
+function ensureSound(){
+ soundContext??=new (window.AudioContext||window.webkitAudioContext)();
+ if(soundContext.state==='suspended')soundContext.resume();
+ return soundContext.currentTime;
+}
+/* Faithful synthesizer settings from the source "큐비의 컴퓨터" HTML. */
+function originalBeep(frequency,duration,type='square',volume=.045,delay=0){
+ const t=ensureSound()+delay;
+ const oscillator=soundContext.createOscillator(),gain=soundContext.createGain();
+ oscillator.type=type;oscillator.frequency.value=frequency;
+ gain.gain.setValueAtTime(volume,t);
+ gain.gain.exponentialRampToValueAtTime(.0001,t+duration);
+ oscillator.connect(gain).connect(soundContext.destination);
+ oscillator.start(t);oscillator.stop(t+duration+.02);
+}
+function originalSendSound(){
+ try{
+  originalBeep(392,.06);
+  originalBeep(523,.08,'square',.05,.06);
+ }catch(e){}
+}
+function acceptedSound(){
+ try{originalBeep(310,.045,'square',.05);}catch(e){}
+}
+function qubiMoveSound(){
+ try{originalBeep(285,.045,'square',.05);}catch(e){}
+}
+// A short, gritty descending cancel/reset cue; sharper timbre than before,
+// but still just two quick notes so it remains distinct from the three-note loss cue.
+function ticTacToeResetSound(){
+ try{
+  const t=ensureSound();
+  playTone(349.23,t,.075,.046,'sawtooth');
+  playTone(261.63,t+.065,.105,.040,'sawtooth');
+ }catch(e){}
+}
+// Per-match tic-tac-toe victory: the former short round-clear cue.
+function ticTacToeWinSound(){
+ try{
+  const t=ensureSound();
+  playTone(523.25,t,.11,.039,'triangle');
+  playTone(659.25,t+.095,.11,.043,'triangle');
+  playTone(880,t+.19,.16,.046,'triangle');
+ }catch(e){/* Audio is optional. */}
+}
+// Tic-tac-toe defeat: a short, unmistakable retro-game defeat jingle.
+// Keep the original wrong cue's gritty sawtooth character, but give it a
+// distinct descending five-note phrase, a deep fall, and a held final note.
+function ticTacToeLoseSound(){
+ try{
+  const t=ensureSound()+.025;
+  const notes=[
+   [246.94,0,   .16,.052],
+   [220.00,.17, .16,.052],
+   [185.00,.34, .19,.055],
+   [146.83,.55, .23,.058],
+   [98.00, .80, .44,.061]
+  ];
+  notes.forEach(([freq,offset,duration,volume])=>{
+   playTone(freq,t+offset,duration,volume,'sawtooth');
+  });
+  // Quiet low fundamental gives the ending weight without turning it harsh.
+  playTone(49,t+.80,.48,.019,'sine');
+ }catch(e){/* Audio is optional. */}
+}
+// Round clear (rounds 1–3): just the opening ascent of the original unlock cue.
+// The complete unlock melody stays reserved for the final game clear.
+function clearSound(){
+ try{
+  [[262,0],[330,.12],[392,.24],[523,.36]]
+   .forEach(([frequency,delay])=>originalBeep(frequency,.16,'square',.055,delay));
+ }catch(e){/* Audio is optional. */}
+}
+// Long "unlock" celebration from the source HTML, reserved for final game completion.
+// Call finalClearSound() when the final round is implemented.
+function finalClearSound(){
+ try{
+  [[262,0],[330,.12],[392,.24],[523,.36],[392,.55],[523,.66],[659,.78],[784,.95]]
+   .forEach(([frequency,delay])=>originalBeep(frequency,.16,'square',.055,delay));
+  originalBeep(1046,.6,'triangle',.05,1.15);
+ }catch(e){}
+}
+function failureSound(){
+ // Original wrong-answer sound, intentionally separate from tic-tac-toe loss.
+ try{
+  originalBeep(130,.2,'sawtooth',.06);
+  originalBeep(98,.25,'sawtooth',.06,.14);
+ }catch(e){}
+}
+function press(digit,button){
+ if(exploded||gameComplete)return;
+ if(round===1 && round1Completed){
+  ticTacToeWinSound(); // Short positive cue on entering round 2.
+  round1Completed=false;
+  round=2;
+  entered='';board=Array(9).fill(null);finished=false;wins=0;qubiTotalWins=0;
+  tttWinShow=false;winSnapshots=[];renderWinBoards();
+  clearLights();renderBoard();
+  sayRoundStart(2);
+  return;
+ }
+ if(round===2 && tttWinShow){
+  ticTacToeWinSound(); // Same short positive cue on entering round 3.
+  // Any key advances from the victory screen; it is not passed to round three.
+  tttWinShow=false;
+  roundTransitioning=false;
+  qubiResetFace();
+  round=3;
+  clearLights();
+  beginWordRound();
+  updateDebug();
+  sayRoundStart(3);
+  return;
+ }
+ if(round===2){ticTacToePress(digit);return;}
+ if(round===3){wordPress(digit);return;}
+ if(round!==1||inputLocked)return;
+ const expected=target[entered.length];
+ if(digit!==expected){
+   recordRoundFailure();
+   inputLocked=true;
+   flashRoundOneKey(button); // Wrong presses still flash briefly.
+   renderPassword(Math.min(target.length,entered.length+1));
+   setTimeout(()=>failureSound(),120);
+   setTimeout(()=>{entered='';clearLights();updateDebug();inputLocked=false;},390);
+   return;
+ }
+ acceptedSound();
+ entered+=digit;
+ flashRoundOneKey(button); // Each correct input flashes only briefly.
+ updateDebug();
+ if(entered===target){
+   round1Completed=true;
+   updateHintAvailability();
+   clearSound();
+   sayRoundClear();
+   clearLights();
+   renderPassword(target.length); // Replace all 8 stars with source Qubi numeral glyphs.
+   updateDebug();
+ }
+}
+// Hidden easter egg: click the upper-left LED ten times within 2.5 s per click.
+// The ?debug=1 URL parameter remains available for development.
+const power=document.getElementById('power');
+const explosionFlash=document.getElementById('explosion-flash');
+// Original "큐비의 컴퓨터" self-destruct audio sequence, kept distinct from gameplay SFX.
+function playBlast(){
+ try{
+  const t=ensureSound();
+  const ctx=soundContext;
+  const len=Math.floor(ctx.sampleRate*1.2);
+  const buffer=ctx.createBuffer(1,len,ctx.sampleRate);
+  const ch=buffer.getChannelData(0);
+  for(let i=0;i<len;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+  const src=ctx.createBufferSource(),lp=ctx.createBiquadFilter(),g=ctx.createGain();
+  src.buffer=buffer;
+  lp.type='lowpass';lp.frequency.value=900;
+  g.gain.value=.25;
+  src.connect(lp).connect(g).connect(ctx.destination);
+  src.start(t);
+  originalBeep(60,1.0,'sine',.2);
+  originalBeep(45,1.4,'sine',.15,.1);
+ }catch(e){}
+}
+function selfDestruct(){
+ if(exploded)return;
+ exploded=true;inputLocked=true;
+ // Tear down any open hint question (including its YES/NO choices) before
+ // the blast. Cancel pending typing/choice timers so they cannot reappear.
+ stopHintTyping();
+ hintOpen=false;
+ hintDialog.classList.remove('open');
+ hintDialogActions.hidden=true;
+ hintDialogText.replaceChildren();
+ hintTrigger.hidden=true;
+ hintTrigger.setAttribute('aria-expanded','false');
+ pendingQubiAnnouncement=null;
+ pendingQubiJoy=false;
+ if(aiTimer!==null){clearTimeout(aiTimer);aiTimer=null;}
+ device.classList.add('exploding');
+ playBlast();
+ let flashes=0;
+ const warning=setInterval(()=>{
+  // Original escalating alarm accompanies each flash.
+  explosionFlash.style.opacity=flashes%2===0?'.25':'0';
+  flashes++;
+  try{originalBeep(1200-flashes*80,.08,'square',.08);}catch(e){}
+  if(flashes>=8){clearInterval(warning);explosionFlash.style.opacity='0';}
+ },120);
+ setTimeout(()=>{
+  playBlast();explosionFlash.style.transition='opacity .08s';explosionFlash.style.opacity='1';
+  setTimeout(()=>{
+   device.style.visibility='hidden';
+   explosionFlash.style.transition='opacity .6s';explosionFlash.style.opacity='0';
+   // Original final dying high-pitched tone sounds when CRT goes dark.
+   setTimeout(()=>{
+    const dead=document.getElementById('explosion-dead');dead.classList.add('show');
+    const dot=document.getElementById('explosion-dot');
+    try{originalBeep(2000,1.5,'sine',.02);}catch(e){}
+    dot.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.2)'}],{duration:2500,fill:'forwards'});
+   },900);
+  },200);
+ },1100);
+}
+power.addEventListener('click',()=>{
+ if(exploded)return;
+ ledClicks++;
+ clearTimeout(ledClickTimer);
+ ledClickTimer=setTimeout(()=>{ledClicks=0;},2500);
+ // Original "큐비의 컴퓨터" LED click: a short rising beep on every click.
+ try{originalBeep(500+ledClicks*60,.04,'square',.03);}catch(e){}
+ if(ledClicks>=10){clearTimeout(ledClickTimer);ledClicks=0;selfDestruct();}
+});
+// Original-style translation secret: arm with right-click on the power LED,
+// then right-click it ten more times to open the password prompt.
+let secretArmed=false,secretRightClicks=0,secretRightTimer=null;
+const secretPrompt=document.getElementById('secretPrompt');
+const secretInput=document.getElementById('secretInput');
+const secretFeedback=document.getElementById('secretFeedback');
+const secretTitle=document.getElementById('secretTitle');
+for(const word of ['암호','무엇']){
+ const cv=document.createElement('canvas');cv.width=5;cv.height=5;
+ drawPixelPattern(cv,originalGlyph(SOURCE_WORDS.indexOf(word)+1));
+ secretTitle.appendChild(cv);
+}
+function closeSecretPrompt(){
+ secretPrompt.classList.remove('show');secretPrompt.setAttribute('aria-hidden','true');
+ secretInput.value='';secretFeedback.textContent='';
+}
+function openSecretPrompt(){
+ if(exploded)return;
+ secretRightClicks=0;
+ secretPrompt.classList.add('show');secretPrompt.setAttribute('aria-hidden','false');
+ secretInput.value='';secretFeedback.textContent='';secretInput.focus();
+}
+power.addEventListener('contextmenu',event=>{
+ event.preventDefault();event.stopPropagation();
+ if(exploded)return;
+ if(!secretArmed){
+  secretArmed=true;power.classList.add('secret-armed');
+  secretRightClicks=0;
+ }else{
+  secretRightClicks++;
+  if(secretRightTimer!==null)clearTimeout(secretRightTimer);
+  secretRightTimer=setTimeout(()=>{secretRightClicks=0;secretRightTimer=null;},2500);
+  if(secretRightClicks>=10){
+   secretRightClicks=0;clearTimeout(secretRightTimer);secretRightTimer=null;
+   openSecretPrompt();
+  }
+ }
+ try{originalBeep(500+secretRightClicks*60,.04,'square',.03);}catch(e){}
+});
+secretPrompt.addEventListener('click',event=>{if(event.target===secretPrompt)closeSecretPrompt();});
+secretInput.addEventListener('keydown',event=>{
+ event.stopPropagation();
+ if(event.key==='Escape'){closeSecretPrompt();return;}
+ if(event.key!=='Enter')return;
+ event.preventDefault();
+ if(secretInput.value.trim().toLowerCase()==='whateverland'){
+  document.body.classList.toggle('translation-on');
+  try{originalBeep(880,.1,'square',.06);setTimeout(()=>originalBeep(1320,.14,'square',.06),100);}catch(e){}
+  closeSecretPrompt();
+ }else{
+  try{wrongSound();}catch(e){}
+  secretInput.value='';secretFeedback.textContent='✕';
+  secretInput.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:160,iterations:2});
+ }
+});
+// Suppress the browser menu on the rest of the cabinet as in the source game.
+document.addEventListener('contextmenu',event=>event.preventDefault());
+// The original game's lightweight source/DevTools shortcut deterrent.
+// Browser tools cannot be fully disabled by a web page.
+document.addEventListener('keydown',event=>{
+ const key=event.key.toLowerCase();
+ const modifier=event.ctrlKey||event.metaKey;
+ const blocked=event.key==='F12'||
+  (modifier&&(key==='u'||key==='s'))||
+  (modifier&&event.shiftKey&&['i','j','c'].includes(key));
+ if(!blocked)return;
+ event.preventDefault();
+ event.stopPropagation();
+ try{originalBeep(180,.10,'sawtooth',.06);}catch(e){}
+ qubiReaction(400);
+},true);
+// Preserve text entry in the hidden translation password field.
+document.addEventListener('selectstart',event=>{
+ if(!event.target.closest('input,textarea,[contenteditable="true"]'))event.preventDefault();
+});
+
+// Development controls are isolated from the normal keyboard and can be switched
+// independently for each stage. Disabling a hint removes its visual reward.
+const debugHintChecks=[...document.querySelectorAll('[data-debug-hint]')];
+function setDebugHint(stage,enabled){
+ debugHintOverrides[stage]=enabled;
+ if(stage===1){
+  if(enabled)revealRoundOneNumberHint();
+  else{
+   device.classList.remove('round1-hint-active');
+   buttons.forEach(button=>button.classList.remove('hint-number'));
+  }
+ }else if(stage===2){
+  device.classList.toggle('round2-hint-active',enabled);
+ }else if(stage===3){
+  if(enabled)revealRoundThreeNumberHint();
+  else device.classList.remove('round3-hint-active');
+ }
+ updateDebug();
+}
+function debugGoToRound(next){
+ if(exploded||![1,2,3].includes(next))return;
+ gameComplete=false;
+ device.classList.remove('game-complete');
+ if(aiTimer!==null){clearTimeout(aiTimer);aiTimer=null;}
+ stopHintTyping();
+ hintOpen=false;
+ hintDialog.classList.remove('open');
+ hintDialogActions.hidden=true;
+ hintDialogText.replaceChildren();
+ hintTrigger.setAttribute('aria-expanded','false');
+ pendingQubiAnnouncement=null;
+ pendingQubiJoy=false;
+ qubiResetFace();
+ if(qubiJoyTimer!==null){clearTimeout(qubiJoyTimer);qubiJoyTimer=null;}
+ qubiFaceCanvas.classList.remove('qubi-joy');
+ round=next;
+ inputLocked=false;roundTransitioning=false;tttWinShow=false;
+ round1Completed=false;entered='';
+ board=Array(9).fill(null);wins=0;finished=false;qubiTotalWins=0;
+ winSnapshots=[];renderWinBoards();
+ wordInput='';wordGroups=[[],[],[]];hintRunning=false;
+ clearLights();
+ placeholder.textContent='';
+ if(next===2)renderBoard();
+ else if(next===3)renderWord();
+ else updateDebug();
+}
+document.getElementById('debugRoundSelect').addEventListener('change',event=>{
+ debugGoToRound(Number(event.target.value));
+});
+debugHintChecks.forEach(check=>check.addEventListener('change',()=>{
+ setDebugHint(Number(check.dataset.debugHint),check.checked);
+}));
+const params=new URLSearchParams(location.search);
+if(params.get('debug')==='1')device.classList.add('debug');
+updateDebug();
+// Source-style boot noise: 3 rows, 6–15 randomly placed 1px dots
+// inside separate 5x5 canvases, appearing at 200ms intervals.
+(async()=>{
+ const noiseRoot=document.getElementById('crtBootNoise');
+ for(let r=0;r<3;r++){
+  const line=document.createElement('div');
+  line.className='noise';
+  const n=6+Math.floor(Math.random()*10);
+  for(let k=0;k<n;k++){
+   const cv=document.createElement('canvas');
+   cv.width=5;cv.height=5;
+   const ctx=cv.getContext('2d');
+   ctx.fillStyle='#123a3e'; // original #1d4d2e, recolored to muted teal
+   ctx.fillRect(Math.floor(Math.random()*5),Math.floor(Math.random()*5),1,1);
+   const wrap=document.createElement('span');
+   wrap.className='g';
+   wrap.style.transform=`translate(${Math.floor(Math.random()*9)-4}px,${Math.floor(Math.random()*19)-9}px)`;
+   wrap.appendChild(cv);line.appendChild(wrap);
+  }
+  noiseRoot.appendChild(line);
+  if(r<2)await new Promise(resolve=>setTimeout(resolve,200));
+ }
+})();
+playOpeningGreeting();
+})();
+</script>
+</body>
+</html>
