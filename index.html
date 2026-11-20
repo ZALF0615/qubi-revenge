@@ -349,6 +349,8 @@ body{background:#5b5648;background-image:radial-gradient(ellipse at 50% 0%,#6a65
 }
 /* Hard pixel jumps with short holds between poses, never a smooth glide. */
 .qubi-face.qubi-joy{animation:qubi-joy-bounce .44s steps(1,end) 3;}
+/* The final birthday celebration lasts longer than ordinary round-clear joy. */
+.device.game-complete .qubi-face.qubi-joy{animation-duration:.5s;animation-iteration-count:6;}
 @media(prefers-reduced-motion:reduce){.qubi-face.qubi-joy{animation:none}}
 
 /* Victory mini-boards inherit the round-two hint's row mapping, only when unlocked. */
@@ -934,7 +936,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#444b50 0%,#252a2f 58%,#11151a
   position:absolute;
   width:clamp(84px,13vw,132px);
   height:clamp(84px,13vw,132px);
-  right:1.8%;
+  right:8.3%;
   top:50%;
   transform:translateY(-50%);
 }
@@ -947,7 +949,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#444b50 0%,#252a2f 58%,#11151a
     font-size:27px;
   }
   .device.game-complete[data-round="3"] .birthday-cake{
-    width:58px;height:58px;right:0.5%;
+    width:58px;height:58px;right:4.5%;
   }
 }
 
@@ -1434,7 +1436,7 @@ function animateQubiJoy(){
  qubiFaceCanvas.classList.remove('qubi-joy');
  void qubiFaceCanvas.offsetWidth; // Restart the animation for each celebration.
  qubiFaceCanvas.classList.add('qubi-joy');
- qubiJoyTimer=setTimeout(()=>{qubiFaceCanvas.classList.remove('qubi-joy');qubiJoyTimer=null;},1320);
+ qubiJoyTimer=setTimeout(()=>{qubiFaceCanvas.classList.remove('qubi-joy');qubiJoyTimer=null;},gameComplete?3000:1320);
 }
 function showQubiJoy(){
  if(hintOpen){pendingQubiJoy=true;return;}
