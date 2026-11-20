@@ -934,7 +934,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#444b50 0%,#252a2f 58%,#11151a
   position:absolute;
   width:clamp(84px,13vw,132px);
   height:clamp(84px,13vw,132px);
-  right:5%;
+  right:1.8%;
   top:50%;
   transform:translateY(-50%);
 }
@@ -947,7 +947,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#444b50 0%,#252a2f 58%,#11151a
     font-size:27px;
   }
   .device.game-complete[data-round="3"] .birthday-cake{
-    width:58px;height:58px;right:1%;
+    width:58px;height:58px;right:0.5%;
   }
 }
 
@@ -1521,10 +1521,10 @@ async function flashLetterPatterns(patterns){
    buttons.forEach((b,i)=>b.classList.toggle('lit',saved.includes(i)||pattern.includes(i)));
    // Each group of simultaneously flashing keys gets its own light, positive cue.
    flashPatternSound();
-   await pause(460);
+   await pause(1050); // Hold each QUBI letter long enough to inspect its three-key pattern.
    if(exploded||round!==activeRound)break;
    buttons.forEach((b,i)=>b.classList.toggle('lit',saved.includes(i)));
-   await pause(230);
+   await pause(480); // A distinct pause before the next letter.
   }
  }finally{
   hintRunning=false;
